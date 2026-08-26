@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.sheet_read_runtime/
+~$*
+.DS_Store
+*.log
+

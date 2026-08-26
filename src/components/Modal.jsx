@@ -1,0 +1,1 @@
+export function Modal({ open, title, onClose, children, className = '' }) { if (!open) return null; return <div className="modal-mask show" onMouseDown={e => e.target === e.currentTarget && onClose()}><div className={`modal ${className}`}><div className="modal-head"><h2>{title}</h2><button className="close" onClick={onClose}>×</button></div>{children}</div></div> }

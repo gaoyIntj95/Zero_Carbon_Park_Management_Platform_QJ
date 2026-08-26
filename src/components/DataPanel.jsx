@@ -1,0 +1,1 @@
+export function DataPanel({ title, description, actions, children, className='' }) { return <section className={`data-panel ${className}`}><div className="panel-head"><div><b>{title}</b>{description && <div className="panel-desc">{description}</div>}</div>{actions && <div className="panel-actions">{actions}</div>}</div>{children}</section> }

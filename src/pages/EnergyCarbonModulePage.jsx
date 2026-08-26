@@ -1,0 +1,37 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { PageHeader } from '../components/PageHeader.jsx'
+import { Tabs } from '../components/Tabs.jsx'
+import { MetricStrip } from '../components/MetricStrip.jsx'
+import { DataPanel } from '../components/DataPanel.jsx'
+import { StatusTag } from '../components/StatusTag.jsx'
+import { enterprises, energyCarbonData, useSharedData } from '../mock/sharedStore.js'
+import { EnergyCarbonMonitoringPage } from './EnergyCarbonMonitoringPage.jsx'
+
+const moduleTabs=[{value:'energy',label:'能源分析'},{value:'carbon',label:'碳排放分析'},{value:'overview',label:'能碳监测总览'},{value:'profile',label:'企业画像'}]
+const trendData={
+  energy:{label:'综合能耗',unit:'万tce',color:'#2f6f4e',values:[14.2,14.8,15.1,15.8,16.1,16.9,17.9]},
+  carbon:{label:'碳排放',unit:'万tCO₂e',color:'#b2762d',values:[13.7,14.0,14.5,14.8,15.2,15.5,16.0]},
+  clean:{label:'绿色能源占比',unit:'%',color:'#397d9c',values:[76.8,78.2,79.4,80.1,81.6,82.7,83.4]},
+}
+const monthLabels=['1月','2月','3月','4月','5月','6月','7月']
+const changeByEnterprise={'ent-001':-3.2,'ent-002':-2.4,'ent-003':-1.7,'ent-004':8.2,'ent-005':4.1,'ent-006':6.4}
+
+export function EnergyCarbonModulePage(){
+  const {search}=useLocation(); const requestedTab=new URLSearchParams(search).get('tab'); const [tab,setTab]=useState(['energy','carbon','overview'].includes(requestedTab)?requestedTab:'overview'); const navigate=useNavigate()
+  useEffect(()=>{setTab(['energy','carbon','overview'].includes(requestedTab)?requestedTab:'overview')},[requestedTab])
+  const {tasks,role}=useSharedData()
+  if(role==='enterprise') return <EnergyCarbonMonitoringPage enterpriseMode />
+  const change=value=>{if(value==='profile')navigate('/enterprise-profile');else navigate(`/energy-carbon-monitoring?tab=${value}`)}
+  const totalEnergy=energyCarbonData.reduce((sum,item)=>sum+item.energy,0); const totalCarbon=energyCarbonData.reduce((sum,item)=>sum+item.emissions,0); const averageClean=energyCarbonData.reduce((sum,item)=>sum+item.cleanRate,0)/energyCarbonData.length; const carbonIntensity=totalEnergy?(totalCarbon/totalEnergy).toFixed(3):'—'
+  const rows=useMemo(()=>energyCarbonData.map(item=>{const enterprise=enterprises.find(x=>x.id===item.enterpriseId);const task=[...tasks].reverse().find(x=>x.enterpriseId===item.enterpriseId&&x.status!=='已关闭');const changeValue=changeByEnterprise[item.enterpriseId]||0;const reason=item.cleanRate<75?'绿色能源占比偏低':changeValue>=6?'能碳增长较快':task&&(task.pendingData||task.pendingVoucher)?'数据待完善':'关注正常';return {...item,enterprise,task,changeValue,reason}}).sort((a,b)=>{const weight={ '绿色能源占比偏低':3,'能碳增长较快':2,'数据待完善':1,'关注正常':0};return (weight[b.reason]-weight[a.reason])||b.energy-a.energy}),[tasks])
+  const completeCount=rows.filter(item=>item.task&&item.task.pendingData===0&&item.task.pendingVoucher===0).length; const pendingData=rows.reduce((sum,item)=>sum+(item.task?.pendingData||0),0); const pendingVoucher=rows.reduce((sum,item)=>sum+(item.task?.pendingVoucher||0),0); const attentionRows=rows.filter(item=>item.reason!=='关注正常').slice(0,2)
+  return <div className="content energy-overview-page"><PageHeader title="园区能碳监测" subtitle="看园区总体能碳表现、变化趋势、重点企业和数据支撑情况。" /><Tabs tabs={moduleTabs} active={tab} onChange={change}/>{tab==='overview'?<>
+    <DataPanel title="园区能碳概况" description="园区年度累计能碳结果，指标均带有统计周期和变化参照。"><MetricStrip metrics={[{label:'综合能源消费',value:`${totalEnergy.toFixed(1)} 万tce`,note:'2026年1–7月累计 · 同比 ↓ 2.1%'},{label:'碳排放',value:`${totalCarbon.toFixed(1)} 万tCO₂e`,note:'2026年1–7月累计 · 同比 ↓ 1.6%'},{label:'绿色能源占比',value:`${averageClean.toFixed(1)}%`,note:'园区企业平均 · 同比 ↑ 2.4%'},{label:'碳排放强度',value:`${carbonIntensity} tCO₂e/tce`,note:'按园区累计能碳结果计算'}]} /></DataPanel>
+    <TrendPanel />
+    <DataPanel className="enterprise-monitor-panel" title="企业能碳监测" description="优先展示能耗较高、能碳增长较快、绿色能源占比偏低或数据待完善的企业。" actions={<span className="result-hint">共 {rows.length} 家企业</span>}><div className="table-wrap"><table><thead><tr><th>企业</th><th>行业</th><th>综合能耗</th><th>碳排放</th><th>绿色能源占比</th><th>同比变化</th><th>关注事项</th><th>操作</th></tr></thead><tbody>{rows.map(item=><tr key={item.id}><td className="item-name">{item.enterprise?.name}</td><td>{item.enterprise?.industry}</td><td>{item.energy} 万tce</td><td>{item.emissions} 万tCO₂e</td><td>{item.cleanRate}%</td><td><span className={item.changeValue>0?'monitor-change-up':'monitor-change-down'}>{item.changeValue>0?'↑':'↓'} {Math.abs(item.changeValue).toFixed(1)}%</span></td><td><StatusTag tone={item.reason==='关注正常'?'ok':'warn'}>{item.reason}</StatusTag></td><td><button className="op-btn" onClick={()=>navigate(`/enterprise-profile?enterpriseId=${item.enterpriseId}`)}>看画像</button></td></tr>)}</tbody></table></div></DataPanel>
+    <DataPanel className="support-panel" title="数据支撑情况" description="只展示当前园区能碳监测可用的数据覆盖和待完善摘要；填报任务详情请进入任务管理。" actions={<button className="btn" onClick={()=>navigate('/reporting-task-monitoring')}>查看填报任务</button>}><div className="support-summary"><div><b>{rows.length}/{enterprises.length}</b><span>企业覆盖</span></div><div><b>{completeCount}/{enterprises.length}</b><span>数据完整</span></div><div><b>{pendingData}项</b><span>待补数据</span></div><div><b>{pendingVoucher}项</b><span>待补凭证</span></div><div><b>2026-08-25</b><span>最近更新时间</span></div></div><div className="support-attention"><div><strong>需关注企业 {attentionRows.length} 家</strong><span>数据支撑不足或能碳结果需要进一步关注</span></div><div className="support-attention-list">{attentionRows.map(item=><button key={item.enterpriseId} onClick={()=>navigate(`/enterprise-profile?enterpriseId=${item.enterpriseId}`)}><span>{item.enterprise?.name}</span><StatusTag tone="warn">{item.reason}</StatusTag><i>查看画像 →</i></button>)}{!attentionRows.length&&<span className="support-empty">当前暂无需关注企业</span>}</div></div></DataPanel>
+  </>:<EnergyCarbonMonitoringPage key={tab} initialTab={tab} embedded />}</div>
+}
+
+function TrendPanel(){const [metric,setMetric]=useState('energy');const config=trendData[metric];const min=Math.min(...config.values);const max=Math.max(...config.values);const padding=Math.max((max-min)*.2,1);const low=min-padding;const high=max+padding;const points=config.values.map((value,index)=>`${32+index*109},${202-(value-low)/(high-low)*166}`).join(' ');return <DataPanel className="trend-panel" title="园区能碳趋势" description="按月观察园区能碳结果变化，帮助识别运行趋势和异常拐点。" actions={<div className="trend-switcher">{Object.entries(trendData).map(([key,item])=><button key={key} className={metric===key?'active':''} onClick={()=>setMetric(key)}>{item.label}</button>)}</div>}><div className="trend-chart"><div className="trend-chart-legend"><span style={{'--legend-color':config.color}}>{config.label}</span><b>{config.values[config.values.length-1]} {config.unit}</b><small>7月</small></div><svg viewBox="0 0 720 238" role="img" aria-label={`${config.label}月度趋势图`}><g className="trend-grid">{[36,78,120,162,204].map(y=><line key={y} x1="32" x2="686" y1={y} y2={y} />)}</g><polyline points={points} fill="none" stroke={config.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />{config.values.map((value,index)=>{const x=32+index*109;const y=202-(value-low)/(high-low)*166;return <g key={monthLabels[index]}><circle cx={x} cy={y} r="4" fill="#fff" stroke={config.color} strokeWidth="2"/><text x={x} y="226" textAnchor="middle">{monthLabels[index]}</text></g>})}</svg></div><div className="trend-note">趋势基于园区月度能碳监测结果，当前页面用于总览发现问题，具体能源结构和碳排放构成请进入对应分析 Tab。</div></DataPanel>}

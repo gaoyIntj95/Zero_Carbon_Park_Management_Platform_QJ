@@ -1,0 +1,1 @@
+export function SectionCard({ title, count, desc, children, special = false }) { return <section className={`group-card ${special ? 'special' : ''}`}><div className="group-head"><div><div className="name">{title}<span className="count">{count}项</span></div><div className="desc">{desc}</div></div></div>{children}</section> }

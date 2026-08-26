@@ -1,0 +1,1 @@
+export function MetricStrip({ metrics }) { return <div className="metric-strip">{metrics.map(item => <div className="metric-box" key={item.label}><div className="metric-label">{item.label}</div><div className="metric-value">{item.value}</div>{item.note && <div className="metric-note">{item.note}</div>}</div>)}</div> }

@@ -1,0 +1,109 @@
+/* Visual theme: deep navy foundation, teal energy accents, mint highlights. */
+:root {
+  --bg: #f4f8f8;
+  --card: #ffffff;
+  --text: #152a35;
+  --muted: #647680;
+  --line: #dfe8e8;
+  --green: #229c8f;
+  --green-dark: #176b63;
+  --green-soft: #e8f6f3;
+  --green-pale: #f2fbf8;
+  --slate-soft: #eef3f4;
+  --shadow: 0 5px 20px rgba(13, 44, 55, .08);
+}
+
+body { background: var(--bg); color: var(--text); }
+.sidebar { background: #163443; color: #e0eeee; }
+.brand small { color: #8ba5ab; }
+.menu-group { color: #82aaa9; }
+.menu-item.active { background: #229c8f; }
+.menu-item:hover { background: #1d4a58; }
+.breadcrumb { color: #71848c; }
+.user { color: #435c66; }
+.btn { color: #26404b; }
+.btn:hover { border-color: #9bc9c3; background: #f7fcfb; }
+select { border-color: #cfe0e0; color: #26404b; }
+.role-switch { color: #31515c; }
+.role-chip { background: rgba(116, 224, 193, .08); border-color: rgba(116, 224, 193, .14); color: #c8e0df; }
+.bar-row { color: #526973; }
+.bar-track { background: #e8f0f0; }
+.info-callout, .info-box { background: #f1faf8; border-color: #d8eeea; color: #4e6670; }
+.kv-item { border-bottom-color: #e8f0f0; }
+.search-input, .cell-input { border-color: #cfe0e0; }
+.enterprise-management-table th:nth-child(1){width:14%}.enterprise-management-table th:nth-child(2){width:14%}.enterprise-management-table th:nth-child(3){width:12%}.enterprise-management-table th:nth-child(4){width:13%}.enterprise-management-table th:nth-child(5){width:13%}.enterprise-management-table th:nth-child(6){width:12%}.enterprise-management-table th:nth-child(7){width:12%}.enterprise-management-table th:nth-child(8){width:10%}
+.enterprise-risk-row{background:#fffdf7}.enterprise-risk-mark{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:10px;background:var(--amber-soft);color:var(--amber);font-size:10px;font-weight:500}
+.view-context{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;margin:-4px 0 14px;font-size:12px}.view-context b{font-size:13px}.view-context span{color:var(--muted)}.park-context{background:#eaf6f4;border:1px solid #d1ece7;color:var(--green-dark)}.enterprise-context{background:#eef4fa;border:1px solid #d9e6f2;color:#315b78}.inline-reporting-summary{display:flex;gap:28px;flex-wrap:wrap;padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--line);color:var(--muted);font-size:12px}.inline-reporting-summary b{color:var(--text);margin-left:4px}
+.service-role-banner{display:flex;align-items:center;gap:14px;padding:11px 14px;margin:-4px 0 14px;border-radius:8px;font-size:12px}.service-role-banner b{font-size:13px}.service-role-banner span{color:var(--muted)}.service-park{background:#eaf6f4;border:1px solid #d1ece7;color:var(--green-dark)}.service-enterprise{background:#eef4fa;border:1px solid #d9e6f2;color:#315b78}
+.service-admin{background:#f3effb;border:1px solid #e3d9f2;color:#5b477c}.admin-center-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.admin-task{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}.admin-task:last-child{border-bottom:0}.admin-task b,.admin-task small{display:block}.admin-task small{color:var(--muted);font-size:11px;margin-top:5px}.admin-shortcuts{display:grid;grid-template-columns:1fr;gap:8px;padding:14px}.admin-shortcut{display:flex;align-items:center;justify-content:space-between;text-align:left;border:1px solid var(--line);border-radius:7px;background:#fbfaff;padding:12px;cursor:pointer;color:var(--text)}.admin-shortcut:hover{border-color:#cbb9e2;background:#f7f2fc}.admin-shortcut b,.admin-shortcut span{display:block}.admin-shortcut span{font-size:11px;color:var(--muted);margin-top:4px}@media(max-width:900px){.admin-center-grid{grid-template-columns:1fr}}
+
+/* Green services uses two workspaces: park governance and enterprise action. */
+.green-service-overview { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(320px,.8fr); gap:14px; margin:14px 0; }
+.green-service-insight { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:16px; }
+.green-service-kpi { padding:13px; background:var(--green-pale); border:1px solid #d8eeea; border-radius:8px; }
+.green-service-kpi span,.green-service-kpi small { display:block; color:var(--muted); font-size:12px; }
+.green-service-kpi b { display:block; margin:5px 0; color:var(--green-dark); font-size:22px; }
+.green-service-kpi small { font-size:11px; line-height:1.45; }
+.green-service-bars { padding:0 16px 16px; }
+.green-service-bar { width:100%; display:grid; grid-template-columns:90px minmax(120px,1fr) 112px; gap:12px; align-items:center; border:0; background:transparent; padding:8px 0; cursor:pointer; text-align:left; color:var(--text); }
+.green-service-bar:hover span { color:var(--green); }
+.green-service-bar span,.green-service-bar strong { font-size:12px; }
+.green-service-bar strong { text-align:right; font-weight:600; }
+.green-service-bar i { height:8px; overflow:hidden; border-radius:8px; background:#e8f0f0; }
+.green-service-bar em { display:block; height:100%; border-radius:8px; background:var(--green); }
+.green-service-alerts { padding:0 16px; }
+.green-service-alert { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border:0; border-bottom:1px solid var(--line); background:transparent; text-align:left; cursor:pointer; color:var(--text); }
+.green-service-alert:last-child { border-bottom:0; }
+.green-service-alert b,.green-service-alert small { display:block; }
+.green-service-alert small { margin-top:4px; color:var(--muted); font-size:11px; }
+.service-progress-table th:nth-child(1){width:14%}.service-progress-table th:nth-child(2){width:27%}.service-progress-table th:nth-child(3){width:16%}.service-progress-table th:nth-child(4){width:28%}.service-progress-table th:nth-child(5){width:15%}.table-subnote{display:block;color:var(--muted);font-size:11px;margin-top:5px}.progress-latest{font-size:12px;font-weight:600}.service-entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}.service-entry{display:flex;align-items:center;justify-content:space-between;text-align:left;border:1px solid var(--line);border-radius:10px;background:#fff;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow);color:var(--text)}.service-entry:hover{border-color:#b9c9bf;background:var(--green-pale)}.service-entry b,.service-entry small{display:block}.service-entry small{color:var(--muted);font-size:11px;margin-top:5px}.service-entry strong{font-size:20px;color:var(--green)}.modal-lead{margin:0 0 14px;color:var(--muted);font-size:12px;line-height:1.6}.service-catalog-list{display:flex;flex-direction:column;gap:8px}.service-catalog-list>div{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;background:var(--green-pale);border:1px solid #e1ece5;border-radius:7px}.service-catalog-list span{font-size:11px;color:var(--muted)}
+.enterprise-service-status { display:grid; grid-template-columns:repeat(3,120px) minmax(0,1fr); gap:12px; align-items:center; padding:16px; background:var(--green-pale); border-bottom:1px solid var(--line); }
+.enterprise-service-status div:not(.enterprise-service-tip) { border-right:1px solid #d8eeea; }
+.enterprise-service-status b,.enterprise-service-status span { display:block; }
+.enterprise-service-status b { color:var(--green-dark); font-size:22px; }
+.enterprise-service-status span { margin-top:4px; color:var(--muted); font-size:12px; }
+.enterprise-service-tip { color:var(--muted); font-size:12px; line-height:1.6; padding-left:8px; }
+.green-service-task-list { padding:0 16px; }
+.op-link{color:var(--green-dark);font-size:12px;font-weight:650;white-space:nowrap}.service-catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}.service-catalog-card{box-shadow:none;padding:15px;min-height:176px}.service-catalog-card p{min-height:42px;line-height:1.6}.service-catalog-card .text-link{display:block;border:0;background:transparent;color:var(--green-dark);padding:8px 0 0;font-size:11px;cursor:pointer}.service-catalog-card .text-link:hover{color:var(--green)}.service-result-note{display:flex;gap:16px;align-items:center;margin:0 16px 16px;padding:12px 14px;background:var(--green-pale);border:1px solid #d8eeea;border-radius:8px;font-size:12px}.service-result-note span{color:var(--muted)}
+.green-service-task,.green-next-item { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:16px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
+.green-service-task:last-child,.green-next-item:last-child { border-bottom:0; }
+.green-service-task b,.green-service-task small,.green-next-item b,.green-next-item small { display:block; }
+.green-service-task small,.green-next-item small { color:var(--muted); font-size:11px; margin-top:5px; }
+.enterprise-green-next { margin-top:14px; }
+.green-next-item { grid-template-columns:auto minmax(0,1fr) auto; padding:13px 16px; }
+.priority-dot { display:flex; width:24px; height:24px; align-items:center; justify-content:center; border-radius:50%; background:var(--green-soft); color:var(--green-dark); font-weight:700; font-size:12px; }
+.priority-dot.warn { background:var(--amber-soft); color:var(--amber); }
+@media(max-width:900px){.green-service-overview{grid-template-columns:1fr}.green-service-insight{grid-template-columns:1fr}.enterprise-service-status{grid-template-columns:repeat(3,1fr)}.enterprise-service-tip{grid-column:1/-1;padding-left:0}.service-entry-grid{grid-template-columns:1fr}.service-progress-table{min-width:760px}.service-catalog-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.service-catalog-grid{grid-template-columns:1fr}.service-result-note{display:block}.service-result-note span{display:block;margin-top:5px}}
+
+/* Use the mint tone sparingly for the highest-priority positive state. */
+.overview-number, .metric-value, .evidence-card .n { color: #176b63; }
+.status.ok, .link-tags span { background: var(--green-soft); color: var(--green-dark); }
+.plain-formula, .formula-card { background: var(--green-pale); border-color: #d8eeea; }
+.data-task-reminder{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;margin:14px 0;background:var(--amber-soft);border:1px solid #f0dfb4;border-radius:8px;color:#72511b;font-size:12px}.enterprise-data-card small{display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:5px}.system-data-collapsible{margin:14px 0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}.system-data-collapsible summary{cursor:pointer;padding:14px 16px;color:var(--green-dark);font-weight:650}.system-data-collapsible summary span{font-size:11px;color:var(--muted);font-weight:400;margin-left:8px}.system-data-collapsible .table-wrap{padding:0 16px 12px}.report-action-table th:nth-child(1){width:22%}.report-action-table th:nth-child(2){width:22%}.report-action-table th:nth-child(3){width:29%}.report-action-table th:nth-child(4){width:15%}.report-action-table th:nth-child(5){width:12%}.detail-filters{margin-top:14px}.detail-trace-note{margin-top:14px;color:var(--muted);font-size:11px;line-height:1.6}
+
+/* Sidebar hierarchy: section labels stay quiet, active section is gently emphasized. */
+.menu-group-link {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #82aaa9;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 12px 0 4px;
+  padding: 9px 10px;
+  border-radius: 7px;
+  letter-spacing: .02em;
+  cursor: pointer;
+}
+.menu-section:first-child .menu-group-link{margin-top:0}.menu-group-marker{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5d8585;margin:0 8px 2px 2px}.menu-group-link.active{background:rgba(34,156,143,.18);color:#bfe6e1}.menu-group-link.active .menu-group-marker{background:#64d7c8}.menu-children{padding-left:8px;border-left:1px solid rgba(137,184,181,.18);margin-left:13px}.menu-children .menu-item{padding-left:14px}.menu-children .menu-child{padding-left:24px;font-size:13px;color:#b9d1d1}
+.menu-group-link:hover { color: #b7d8d5; background: transparent; }
+.menu-group-link.active {
+  color: #d9f0eb;
+  border-left: 3px solid #5fd2bd;
+  padding-left: 7px;
+}
+.menu-child { padding-left: 24px; }
+.menu-child.active { background: #229c8f; color: #fff; }

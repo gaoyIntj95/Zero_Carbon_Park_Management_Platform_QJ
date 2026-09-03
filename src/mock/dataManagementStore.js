@@ -22,6 +22,13 @@ const energySeed = [
 ]
 const months = Array.from({length:8}, (_,index)=>`2026-${String(index+1).padStart(2,'0')}`)
 const operationSeed = enterprises.map((enterprise,index)=>({ operationDataId:`operation-${enterprise.enterpriseId}`, enterpriseId:enterprise.enterpriseId, value:[52000,42000,38000,46000,26000,61000][index], unit:'万元', source:index===1?'企业填报':'运营台账' }))
+const productOutputSeed = [
+  { enterpriseId:'ent-001', productId:'product-ent-001-rod', productName:'单晶硅棒', value:3.5, unit:'万吨' },
+  { enterpriseId:'ent-001', productId:'product-ent-001-wafer', productName:'单晶硅片', value:1200, unit:'万片' },
+  { enterpriseId:'ent-002', productId:'product-ent-002-wafer', productName:'单晶硅片', value:980, unit:'万片' },
+  { enterpriseId:'ent-003', productId:'product-ent-003-cell', productName:'光伏电池', value:2.8, unit:'GWh' },
+  { enterpriseId:'ent-004', productId:'product-ent-004-battery', productName:'储能电池', value:1.6, unit:'GWh' },
+]
 const specialSeed = [
   { specialDataId:'special-roof-ent-001', dataItemCode:'SPECIAL_ROOF_AVAILABLE_AREA', enterpriseId:'ent-001', period:'2026', value:82000, unit:'m²', voucher:'企业厂区建筑台账' },
   { specialDataId:'special-pv-roof-ent-001', dataItemCode:'SPECIAL_ROOF_PV_AREA', enterpriseId:'ent-001', period:'2026', value:31000, unit:'m²', voucher:'光伏竣工资料' },
@@ -44,6 +51,7 @@ export const dataItemDefinitions = [
   { dataItemCode:'ENERGY_NATURAL_GAS', dataDomain:'energy', name:'天然气消费', unit:'万Nm³', frequency:'MONTHLY' },
   { dataItemCode:'ENERGY_HEAT', dataDomain:'energy', name:'外购热力', unit:'万GJ', frequency:'MONTHLY' },
   { dataItemCode:'OP_INDUSTRIAL_VALUE', dataDomain:'operation', name:'工业增加值', unit:'万元', frequency:'MONTHLY' },
+  { dataItemCode:'OP_PRODUCT_OUTPUT', dataDomain:'operation', name:'产品产量', unit:'按产品记录', frequency:'MONTHLY' },
   { dataItemCode:'CARBON_SCOPE1', dataDomain:'carbon', name:'范围一碳排放', unit:'万tCO₂e', frequency:'MONTHLY' },
   { dataItemCode:'CARBON_SCOPE2', dataDomain:'carbon', name:'范围二碳排放', unit:'万tCO₂e', frequency:'MONTHLY' },
   { dataItemCode:'SPECIAL_ROOF_AVAILABLE_AREA', dataDomain:'special', name:'可利用屋顶面积', unit:'m²', frequency:'ANNUAL' },
@@ -74,8 +82,8 @@ export function getApplicableDataRequirements(enterpriseRows=enterprises, year='
   }))
 }
 
-const commonRecord = ({ recordId, enterpriseId, dataDomain, dataItemCode, period, value, unit, sourceType, sourceRecordId, sourceRecordIds, dataStatus='正式', qualityStatus='正常', evidence='—', updatedAt='2026-08-25 10:30', version=1, objectType='ENTERPRISE', indicatorId }) => ({
-  recordId, objectType, objectId:enterpriseId, enterpriseId, dataDomain, dataItemCode, period, value, unit, sourceType, sourceRecordId, sourceRecordIds:sourceRecordIds||[], evidence, dataStatus, qualityStatus, createdAt:'2026-08-20 09:00', updatedAt, version, indicatorId,
+const commonRecord = ({ recordId, enterpriseId, dataDomain, dataItemCode, period, value, unit, sourceType, sourceRecordId, sourceRecordIds, productId, productName, dataStatus='正式', qualityStatus='正常', evidence='—', updatedAt='2026-08-25 10:30', version=1, objectType='ENTERPRISE', indicatorId }) => ({
+  recordId, objectType, objectId:enterpriseId, enterpriseId, productId, productName, dataDomain, dataItemCode, period, value, unit, sourceType, sourceRecordId, sourceRecordIds:sourceRecordIds||[], evidence, dataStatus, qualityStatus, createdAt:'2026-08-20 09:00', updatedAt, version, indicatorId,
   history:version > 1 ? [{ version:version-1, value:typeof value === 'number' ? Number((value * 0.97).toFixed(2)) : value, dataStatus:'正式', updatedAt:'2026-07-31 16:20', reason:'月度数据复核前版本' }] : [],
 })
 
@@ -86,12 +94,13 @@ const energyRecords = energySeed.flatMap((item,index)=>months.flatMap(period=>[
   ...(item.heat? [commonRecord({recordId:`bdr-heat-${item.enterpriseId}-${period}`,enterpriseId:item.enterpriseId,dataDomain:'energy',dataItemCode:'ENERGY_HEAT',period,value:item.heat,unit:'万GJ',sourceType:'企业常规填报',sourceRecordId:`${item.id}-heat`,evidence:'外购热力结算台账'})] : []),
 ]))
 const operationRecords = operationSeed.flatMap((item,index)=>months.map(period=>commonRecord({recordId:`bdr-operation-${item.enterpriseId}-${period}`,enterpriseId:item.enterpriseId,dataDomain:'operation',dataItemCode:'OP_INDUSTRIAL_VALUE',period,value:item.value,unit:item.unit,sourceType:item.source==='企业填报'?'企业常规填报':'园区维护',sourceRecordId:item.operationDataId,evidence:'企业经营台账',dataStatus:index===5&&period==='2026-07'?'待审核':'正式',qualityStatus:index===5&&period==='2026-07'?'来源冲突':'正常'})))
+const productOutputRecords = productOutputSeed.flatMap(item => months.map(period => commonRecord({recordId:`bdr-product-output-${item.productId}-${period}`,enterpriseId:item.enterpriseId,productId:item.productId,productName:item.productName,dataDomain:'operation',dataItemCode:'OP_PRODUCT_OUTPUT',period,value:item.value,unit:item.unit,sourceType:'企业常规填报',sourceRecordId:item.productId,evidence:'产品产量台账',objectType:'ENTERPRISE'})))
 const carbonRecords = energySeed.flatMap((item,index)=>months.flatMap(period=>[
   commonRecord({recordId:`bdr-carbon-scope1-${item.enterpriseId}-${period}`,enterpriseId:item.enterpriseId,dataDomain:'carbon',dataItemCode:'CARBON_SCOPE1',period,value:Number((item.gas*0.025).toFixed(2)),unit:'万tCO₂e',sourceType:'系统计算',sourceRecordIds:[`bdr-gas-${item.enterpriseId}-${period}`],sourceRecordId:`bdr-gas-${item.enterpriseId}-${period}`,evidence:'天然气活动数据；排放因子版本 EF-2026-01',qualityStatus:index===5&&period==='2026-07'?'待确认':'正常'}),
   commonRecord({recordId:`bdr-carbon-scope2-${item.enterpriseId}-${period}`,enterpriseId:item.enterpriseId,dataDomain:'carbon',dataItemCode:'CARBON_SCOPE2',period,value:Number((item.electricity*0.0024+(item.heat||0)*0.018).toFixed(2)),unit:'万tCO₂e',sourceType:'系统计算',sourceRecordIds:[`bdr-electricity-${item.enterpriseId}-${period}`,...(item.heat?[`bdr-heat-${item.enterpriseId}-${period}`]:[])],sourceRecordId:`bdr-electricity-${item.enterpriseId}-${period}`,evidence:'购入电力/热力活动数据；排放因子版本 EF-2026-01',qualityStatus:index===3&&period==='2026-07'?'待确认':'正常'}),
 ]))
 const specialRecords = specialSeed.map((item,index)=>commonRecord({recordId:`bdr-special-${item.enterpriseId}-${item.dataItemCode}`,enterpriseId:item.enterpriseId,dataDomain:'special',dataItemCode:item.dataItemCode,period:item.period,value:item.value,unit:item.unit,sourceType:'企业专项填报',sourceRecordId:item.specialDataId,evidence:item.voucher,dataStatus:'正式',qualityStatus:index===5?'待确认':'正常'}))
-const rawBusinessDataRecords=[...energyRecords,...operationRecords,...carbonRecords,...specialRecords]
+const rawBusinessDataRecords=[...energyRecords,...operationRecords,...productOutputRecords,...carbonRecords,...specialRecords]
 
 export const dataIssues = [
   { issueId:'issue-001', objectType:'BUSINESS_DATA', objectId:'bdr-electricity-ent-004-2026-07', enterpriseId:'ent-004', dataItemCode:'ENERGY_ELECTRICITY', period:'2026-07', issueType:'待确认', currentValue:'1680 万kWh', sourceRecordId:'ec-004', reason:'购电结算值与企业提交凭证存在差异，需企业核实。', responsibleParty:'ENTERPRISE', relatedIOC:['能源流向态势','碳排放与降碳态势'], relatedIndicator:['单位能耗碳排放'], status:'待处理', createdAt:'2026-08-25 09:20', resolvedAt:'', note:'仅企业责任问题允许进入企业补充任务。' },

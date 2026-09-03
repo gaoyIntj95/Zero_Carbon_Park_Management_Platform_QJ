@@ -8,34 +8,42 @@ import { StatusTag } from '../components/StatusTag.jsx'
 import { Modal } from '../components/Modal.jsx'
 import { enterprises, useSharedData } from '../mock/sharedStore.js'
 
+const categoryOrder=['企业基础信息','能源与碳排数据','资源循环与绿色制造','零碳专项建设']
+const moduleMeta={
+  '企业基础信息':{desc:'企业档案与生产边界信息，系统已带入的内容无需重复填写。'},
+  '能源与碳排数据':{desc:'汇集能源消费、生产经营和范围一、范围二排放数据。'},
+  '资源循环与绿色制造':{desc:'归集固废、水、余热余压利用及绿色制造认证成果。'},
+  '零碳专项建设':{desc:'填报光伏、绿建、新能源交通、碳足迹等特色建设成果。'},
+}
+const displayValue = item => item.value ? `${item.value}${item.unit ? ` ${item.unit}` : ''}` : '暂无数据'
 export function EnterpriseDataReportingPage() {
   const navigate = useNavigate()
   const { items, currentTask, currentEnterpriseId, updateItem, uploadVoucher, submitTask } = useSharedData()
-  const [category, setCategory] = useState('all'), [detail, setDetail] = useState(null), [message, setMessage] = useState(''), [guide, setGuide] = useState(false)
-  const categories = useMemo(() => [...new Set(items.map(item => item.category).filter(Boolean))], [items])
-  const activeCategory = category === 'all' ? 'all' : category || categories[0]
-  const current = activeCategory === 'all' ? items : items.filter(item => item.category === activeCategory)
-  const supplementItems = current.filter(item => item.source !== '系统已有')
-  const systemItems = current.filter(item => item.source === '系统已有')
-  const pending = items.filter(item => item.required && !item.value).length
-  const vouchers = items.filter(item => item.voucher && !item.voucherUploaded).length
-  const completed = pending === 0 && vouchers === 0
-  const taskUnits = items.filter(item => item.required).length + items.filter(item => item.voucher).length
-  const completedUnits = Math.max(0, taskUnits - pending - vouchers)
-  const enterprise = enterprises.find(item => item.id === currentEnterpriseId)
-  const returned = currentTask?.status === '已退回'
-  const locked = ['已提交', '已入库', '已关闭'].includes(currentTask?.status)
+  const [category, setCategory] = useState('all'), [detail, setDetail] = useState(null), [message, setMessage] = useState('')
+  const categories = useMemo(() => categoryOrder.filter(value => items.some(item => item.category === value)), [items])
+  const current = category === 'all' ? items : items.filter(item => item.category === category)
+  const pending = items.filter(item => item.source !== '系统已有' && !item.value).length, vouchers = items.filter(item => item.source !== '系统已有' && item.voucher && !item.voucherUploaded).length, taskCount = items.length, doneCount = items.filter(item => item.value && (!item.voucher || item.voucherUploaded)).length
+  const enterprise = enterprises.find(item => item.id === currentEnterpriseId), returned = currentTask?.status === '已退回', locked = ['已提交', '已入库', '已关闭'].includes(currentTask?.status)
+  const itemStatus = item => {
+    if (item.source === '系统已有') return '已入库'
+    if (returned) return '待填写'
+    if (currentTask?.status === '已入库') return '已入库'
+    if (currentTask?.status === '已提交') return '审核中'
+    return '待填写'
+  }
+  const statusTone = status => ['已入库','审核通过'].includes(status) ? 'ok' : ['待填写','审核中','已提交'].includes(status) ? 'warn' : 'gray'
   const submit = () => { const result = submitTask(currentTask?.taskId); setMessage(result.ok ? '提交成功，已进入园区审核。' : result.reason) }
   const saveDraft = () => setMessage('草稿已保存。')
-  return <div className="content enterprise-content"><PageHeader title="填报任务" subtitle="围绕园区本次任务补充系统暂未获取的数据和凭证。" actions={<><button className="btn" onClick={() => setGuide(true)}>填报说明</button><button className="btn primary" disabled={!currentTask || locked} onClick={submit}>{locked ? '已提交' : '提交填报'}</button></>} />
-    <div className="report-task-summary"><div><span>任务名称</span><b>{currentTask?.period ? `${currentTask.period}企业数据补充任务` : '暂无年度任务'}</b></div><div><span>统计年度</span><b>{currentTask?.period?.replace('年度','') || '2026'}</b></div><div><span>截止日期</span><b>{currentTask?.deadline || '—'}</b></div><div><span>当前状态</span><StatusTag tone={returned ? 'warn' : completed ? 'ok' : 'gray'}>{returned ? '需修改' : currentTask?.status || '—'}</StatusTag></div></div>
-    {message && <div className={`notice ${message.includes('成功') || message.includes('保存') ? 'success' : 'warning'}`}>{message}</div>}{returned && <div className="notice warning">本次填报有数据需要修改：{currentTask.reviewNote || '请核对填报数据和凭证。'}</div>}<div className="info-callout">系统已有数据无需重复填写；请完成标记为“企业填报”的数据项及必要凭证。</div>
-    <MetricStrip metrics={[{label:'任务完成度',value:`${completedUnits} / ${taskUnits}`,note:'按数据项与凭证要求统计'},{label:'待补数据',value:pending+'项',note:'需要企业补充'},{label:'待补凭证',value:vouchers+'项',note:'已有数据但缺少证明材料'},{label:'系统已获取',value:items.filter(item => item.source === '系统已有').length+'项',note:'无需重复填写'}]} />
-    <div className="report-workbench-note"><b>本次任务只补缺失项</b><span>系统已有数据由数据管理沉淀并自动带入；如发现数值有误，请反馈数据问题，不在本任务中直接修改底层数据。</span><button className="op-btn" onClick={() => navigate('/data-issues')}>反馈数据问题 →</button></div>
-    <Tabs tabs={[{value:'all',label:`全部待处理 ${items.filter(item => item.source !== '系统已有').length}`}, ...categories.map(value => ({ value, label:value }))]} active={activeCategory} onChange={setCategory} />
-    <DataPanel title="需要你处理" description={`${enterprise?.name || '当前企业'}本次任务中的补充数据与凭证`} actions={<button className="btn" onClick={saveDraft}>保存草稿</button>}><div className="table-wrap"><table className="report-action-table"><thead><tr><th>数据项</th><th>当前情况</th><th>需要处理</th><th>状态</th><th>操作</th></tr></thead><tbody>{supplementItems.length ? supplementItems.map(item => { const needsRevision = returned && item.reviewStatus === '已退回'; const status = needsRevision ? '待确认' : item.value ? (item.voucher && !item.voucherUploaded ? '待补凭证' : '已就绪') : '待补充'; return <tr key={item.id}><td className="item-name">{item.name}<small className="table-subnote">{item.category}</small></td><td>{item.value ? `${item.value} ${item.unit}` : '暂无数据'}</td><td>{item.value && item.voucher && !item.voucherUploaded ? '上传对应凭证' : item.voucher ? '补充年度数据并上传凭证' : '补充年度数据'}</td><td><StatusTag tone={status === '已就绪' ? 'ok' : 'warn'}>{status}</StatusTag></td><td>{item.value && item.voucher && !item.voucherUploaded ? <button className="op-btn" disabled={locked} onClick={() => uploadVoucher(item.id)}>上传</button> : <button className="op-btn" disabled={locked} onClick={() => setDetail(item)}>填写</button>}</td></tr> }) : <tr><td colSpan="5" className="empty-cell">当前暂无待处理项</td></tr>}</tbody></table></div></DataPanel>
-    <details className="system-data-collapsible"><summary>系统已自动获取 {systemItems.length}项 ✓ <span>这些数据无需重复填写</span></summary><div className="table-wrap"><table><thead><tr><th>数据项</th><th>当前值</th><th>来源</th><th>状态</th><th>操作</th></tr></thead><tbody>{systemItems.length ? systemItems.map(item => <tr key={item.id}><td className="item-name">{item.name}</td><td><b>{item.value || '—'}</b> {item.unit}</td><td>系统采集</td><td><StatusTag tone="ok">已就绪</StatusTag></td><td><button className="op-btn" onClick={() => setDetail(item)}>查看来源</button><button className="op-btn" onClick={() => navigate('/data-issues')}>反馈问题</button></td></tr>) : <tr><td colSpan="5" className="empty-cell">暂无系统自动获取数据</td></tr>}</tbody></table></div></details>
+  const saveItem = event => { event.preventDefault(); const form = new FormData(event.currentTarget); updateItem(detail.id, form.get('value')); setDetail(null); setMessage(`${detail.name}已保存到本次任务，提交审核后将回写企业数据管理。`) }
+  const renderTable = rows => <div className="table-wrap"><table className="report-action-table"><thead><tr><th>数据项</th><th>填报说明</th><th>当前情况</th><th>影响指标</th><th>状态</th><th>操作</th></tr></thead><tbody>{rows.length ? rows.map(item => { const status = itemStatus(item), needsVoucher = item.source !== '系统已有' && item.value && item.voucher && !item.voucherUploaded; return <tr key={item.id}><td className="item-name">{item.name}<small className="table-subnote">{item.source === '系统已有' ? '系统自动获取，无需重复填写' : item.voucher ? '需填写数据并上传证明材料' : '需填写年度数据'}</small></td><td>{item.purpose}</td><td>{displayValue(item)}</td><td>{item.businessLinks?.join('、') || '相关指标计算'}</td><td><StatusTag tone={statusTone(status)}>{status}</StatusTag></td><td>{item.source === '系统已有' ? <button className="op-btn" onClick={() => navigate('/data-issues')}>反馈问题</button> : needsVoucher ? <button className="op-btn" disabled={locked} onClick={() => uploadVoucher(item.id)}>上传材料</button> : <button className="op-btn" disabled={locked} onClick={() => setDetail(item)}>{item.value ? '查看 / 修改' : '填写'}</button>}</td></tr> }) : <tr><td colSpan="6" className="empty-cell">当前分类暂无数据项</td></tr>}</tbody></table></div>
+  return <div className="content enterprise-content"><PageHeader title="企业数据协同填报" subtitle="按企业数据对象协同填报，经园区审核后入库并支撑零碳指标计算。" />
+    <div className="report-task-summary"><div><span>任务名称</span><b>企业年度数据协同填报</b></div><div><span>统计年度</span><b>{currentTask?.period?.replace('年度','') || '2026'}</b></div><div><span>截止日期</span><b>{currentTask?.deadline || '—'}</b></div><div><span>当前状态</span><StatusTag tone={returned ? 'warn' : currentTask?.status === '已入库' ? 'ok' : 'gray'}>{returned ? '需修改' : currentTask?.status || '—'}</StatusTag></div></div>
+    {message && <div className={`notice ${message.includes('成功') || message.includes('保存') ? 'success' : 'warning'}`}>{message}</div>}{returned && <div className="notice warning">本次填报有数据需要修改：{currentTask.reviewNote || '请核对填报数据和凭证。'}</div>}<div className="info-callout">系统自动获取的数据已带入；企业补充数据和材料提交后由园区审核，审核通过后进入正式数据管理，并用于零碳指标计算和 IOC 展示。</div>
+    <MetricStrip metrics={[{label:'数据项总数',value:`${taskCount}项`,note:`已完成 ${doneCount} 项`},{label:'已完成',value:`${doneCount}项`,note:'数据及所需材料均已齐全'},{label:'待补充数据',value:`${pending}项`,note:'需要企业填写的数据'},{label:'待上传材料',value:`${vouchers}项`,note:'需要补充证明材料'},{label:'系统自动获取',value:`${items.filter(item => item.source === '系统已有').length}项`,note:'已带入，无需重复填写'}]} />
+    <div className="report-workbench-note"><b>数据协同闭环</b><span>企业填写 → 提交 → 园区审核 → 审核通过 → 正式入库 → 指标计算与 IOC 展示</span><button className="op-btn" onClick={() => navigate('/data-issues')}>反馈数据问题 →</button></div>
+    <Tabs tabs={[{value:'all',label:`全部 ${items.length}`}, ...categories.map(value => ({ value, label:`${value} ${items.filter(item => item.category === value).length}` }))]} active={category} onChange={setCategory} />
+    <DataPanel title={category === 'all' ? '本次填报数据' : category} description={`${enterprise?.name || '当前企业'}需确认的数据与材料；按业务模块归类展示。`} actions={<button className="btn" onClick={saveDraft}>保存草稿</button>}>{category === 'all' ? <div className="report-module-grid">{categories.map(module => { const rows = items.filter(item => item.category === module); return <section className="report-module-card" key={module}><div className="report-module-head"><div><b>{module}</b><p>{moduleMeta[module]?.desc}</p></div><span>{rows.length} 项</span><button className="op-btn" onClick={() => setCategory(module)}>查看本模块 →</button></div>{renderTable(rows)}</section> })}</div> : renderTable(current)}</DataPanel>
     <div className="modal-foot page-actions"><button className="btn" onClick={saveDraft}>保存草稿</button><button className="btn primary" disabled={!currentTask || locked} onClick={submit}>{locked ? '已提交' : '提交填报'}</button></div>
-    <Modal open={!!detail} title={detail?.name || '填报说明'} onClose={() => setDetail(null)} className="small">{detail && <div className="modal-body"><div className="kv"><div className="kv-item"><label>数据项</label>{detail.name}</div><div className="kv-item"><label>当前值</label>{detail.value || '待填写'} {detail.unit}</div><div className="kv-item"><label>填写说明</label>{detail.note || '请按当前企业实际情况填写本年度数据。'}</div><div className="kv-item"><label>数据用途</label>{detail.businessLinks?.join('、') || '用于园区年度能碳数据汇总。'}</div><div className="kv-item"><label>凭证要求</label>{detail.voucherRequired ? '请上传与本数据项对应的合同、结算凭证或证明材料。' : '无需上传凭证。'}</div></div></div>}</Modal><Modal open={guide} title="填报说明" onClose={() => setGuide(false)} className="small"><div className="modal-body"><p>请只填写数据管理中标记为“企业填报”的数据项；系统已有数据无需重复填写，必要凭证请跟随数据项上传。</p><p>提交前请确认必填数据和必要凭证均已完成。</p></div></Modal>
+    <Modal open={!!detail} title={detail?.name || '填报数据'} onClose={() => setDetail(null)} className="small">{detail && <form onSubmit={saveItem}><div className="modal-body"><div className="kv"><div className="kv-item"><label>填报说明</label>{detail.purpose}</div><div className="kv-item"><label>影响指标</label>{detail.businessLinks?.join('、') || '相关指标计算'}</div><div className="field"><label>填报数值{detail.unit ? `（${detail.unit}）` : ''}</label><input name="value" type={detail.inputType || 'number'} step={detail.inputType === 'text' ? undefined : 'any'} defaultValue={detail.value} required disabled={locked}/></div><div className="kv-item"><label>证明材料</label>{detail.voucher ? '保存后请在列表上传对应材料。' : '本项无需上传材料。'}</div></div></div><div className="modal-foot"><button type="button" className="btn" onClick={() => setDetail(null)}>取消</button><button className="btn primary" disabled={locked}>保存</button></div></form>}</Modal>
   </div>
 }

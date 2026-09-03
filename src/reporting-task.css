@@ -1,0 +1,47 @@
+.enterprise-content .metric-strip{grid-template-columns:repeat(5,minmax(0,1fr))}
+.enterprise-content .report-action-table{min-width:1060px}
+.enterprise-content .report-action-table th:nth-child(1){width:17%}
+.enterprise-content .report-action-table th:nth-child(2){width:31%}
+.enterprise-content .report-action-table th:nth-child(3){width:14%}
+.enterprise-content .report-action-table th:nth-child(4){width:22%}
+.enterprise-content .report-action-table th:nth-child(5){width:8%}
+.enterprise-content .report-action-table th:nth-child(6){width:8%}
+.enterprise-content .report-action-table td{font-size:12px;line-height:1.55}
+.report-module-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px;background:#fafbfa}
+.report-module-card{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.report-module-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:14px 16px;background:#f7faf8;border-bottom:1px solid var(--line);border-left:4px solid var(--green)}
+.report-module-head b{font-size:15px;color:var(--green-dark)}
+.report-module-head p{margin:4px 0 0;font-size:11px;line-height:1.5;color:var(--muted)}
+.report-module-head>span{grid-column:2;grid-row:1;color:var(--muted);font-size:12px;white-space:nowrap}
+.report-module-head .op-btn{grid-column:2;grid-row:2;white-space:nowrap}
+.report-module-card .table-wrap{overflow:auto}
+.report-module-card .report-action-table{min-width:850px}
+@media(max-width:1100px){.report-module-grid{grid-template-columns:1fr}}
+
+@media(max-width:1100px){
+  .enterprise-content .metric-strip{grid-template-columns:repeat(3,1fr)}
+  .enterprise-content .metric-box:nth-child(3){border-right:0}
+  .enterprise-content .metric-box:nth-child(-n+3){border-bottom:1px solid var(--line)}
+}
+@media(max-width:640px){
+  .enterprise-content .metric-strip{grid-template-columns:1fr 1fr}
+  .enterprise-content .metric-box:nth-child(2){border-right:0}
+  .enterprise-content .metric-box:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+
+/* 进度与审核表的列数不同，分别按实际列数等宽铺满，避免字段集中在中间列。 */
+.enterprise-task-table.progress-task-table,
+.enterprise-task-table.review-task-table{min-width:1440px;table-layout:fixed}
+.enterprise-task-table.progress-task-table th:nth-child(n),
+.enterprise-task-table.progress-task-table td:nth-child(n){width:10%;overflow-wrap:anywhere}
+.enterprise-task-table.review-task-table th:nth-child(n),
+.enterprise-task-table.review-task-table td:nth-child(n){width:8.3333%;overflow-wrap:anywhere}
+
+/* 园区能碳总览趋势：三类指标同图展示，不再通过按钮切换。 */
+.trend-chart-legend-multi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:center;margin-bottom:8px}
+.trend-chart-legend-multi span{display:flex;align-items:center;gap:7px;padding-left:0;color:var(--text);white-space:nowrap}
+.trend-chart-legend-multi span:before{display:none}
+.trend-chart-legend-multi span i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--legend-color);flex:none}
+.trend-chart-legend-multi b{font-size:16px;margin-left:auto}
+.trend-chart-legend-multi small{font-size:10px}
+@media(max-width:760px){.trend-chart-legend-multi{grid-template-columns:1fr;gap:7px}.trend-chart-legend-multi span{max-width:260px}}

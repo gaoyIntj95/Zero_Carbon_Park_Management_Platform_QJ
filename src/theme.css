@@ -107,3 +107,21 @@ select { border-color: #cfe0e0; color: #26404b; }
 }
 .menu-child { padding-left: 24px; }
 .menu-child.active { background: #229c8f; color: #fff; }
+
+/* 服务总览按服务类型展开后的九列布局。 */
+.service-progress-table { min-width: 1280px; }
+.service-progress-table th:nth-child(1) { width: 12%; }
+.service-progress-table th:nth-child(2), .service-progress-table th:nth-child(3), .service-progress-table th:nth-child(4), .service-progress-table th:nth-child(5), .service-progress-table th:nth-child(6) { width: 10%; }
+.service-progress-table th:nth-child(7) { width: 12%; }
+.service-progress-table th:nth-child(8) { width: 18%; }
+.service-progress-table th:nth-child(9) { width: 8%; }
+
+/* 企业绿色服务三个独立子页面内的表格字段等宽铺开。 */
+.service-hub-page .data-panel table:not(.service-progress-table) { min-width: 960px; }
+.service-hub-page .data-panel table:not(.service-progress-table) th { width: auto; }
+.service-results-matrix { min-width: 1080px; table-layout: fixed; }
+.service-results-matrix th:nth-child(n), .service-results-matrix td:nth-child(n) { width: 16.666%; overflow-wrap: anywhere; }
+
+/* 填报任务管理的企业任务字段等宽铺满表格画布。 */
+.enterprise-task-table { min-width: 1440px; table-layout: fixed; }
+.enterprise-task-table th:nth-child(n), .enterprise-task-table td:nth-child(n) { width: 11.111%; overflow-wrap: anywhere; }

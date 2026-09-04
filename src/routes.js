@@ -5,16 +5,17 @@ const both = ['committee', 'enterprise']
 
 // 单一系统的三种视角：菜单只表达当前角色可进入的业务边界。
 export const pageRoutes = [
-  { path:'/zero-carbon-indicators', title:'零碳指标管控', menuLabel:'零碳指标管控', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:1 },
-  { path:'/energy-carbon-monitoring', title:'园区能碳监测', menuLabel:'园区能碳监测', groups:{committee:'园区零碳管理',enterprise:'企业绿色服务'}, roleLabels:{enterprise:'企业能碳监测'}, roles:both, pageType:'module', menuVisible:true, menuVisibleRoles:committee, order:2 },
-  { path:'/reporting-task-monitoring', title:'填报任务管理', menuLabel:'填报任务管理', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:3 },
-  { path:'/zero-carbon-results', title:'零碳成果与验收支撑', menuLabel:'零碳成果与验收支撑', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:4 },
+  { path:'/zero-carbon-indicators', title:'零碳园区总览', menuLabel:'零碳园区总览', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:1 },
+  { path:'/energy-carbon-monitoring', title:'园区能碳监测', menuLabel:'园区能碳监测', groups:{committee:'园区零碳管理',enterprise:'企业绿色服务'}, roleLabels:{enterprise:'企业能碳监测'}, roles:both, pageType:'module', menuVisible:false, order:2 },
+  { path:'/reporting-task-monitoring', title:'零碳指标填报管理', menuLabel:'零碳指标填报', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:3 },
+  { path:'/zero-carbon-results', title:'零碳验收支撑', menuLabel:'零碳验收支撑', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:4 },
 
-  { path:'/enterprise-green-services', title:'企业绿色服务', menuLabel:'企业绿色服务', group:'企业绿色服务', roles:committee, pageType:'module', menuVisible:true, menuGroupOnly:true, order:1 },
-  { path:'/enterprise-green-services/overview', title:'服务总览', menuLabel:'服务总览', group:'企业绿色服务', roles:committee, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:true, order:1 },
-  { path:'/enterprise-green-services/management', title:'服务管理', menuLabel:'服务管理', group:'企业绿色服务', roles:committee, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:true, order:2 },
-  { path:'/enterprise-green-services/results', title:'服务成果', menuLabel:'服务成果', group:'企业绿色服务', roles:committee, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:true, order:3 },
-  { path:'/enterprise-profile', title:'园区零碳推演与企业画像', menuLabel:'园区零碳推演与企业画像', groups:{committee:'园区零碳管理',enterprise:'企业绿色服务'}, roleLabels:{enterprise:'企业能碳画像'}, roles:both, pageType:'module', menuVisible:true, menuVisibleRoles:committee, order:5 },
+  { path:'/enterprise-green-services', title:'企业绿色服务', menuLabel:'企业绿色服务', group:'企业绿色发展', roles:committee, pageType:'module', menuVisible:true, menuGroupOnly:true, order:2 },
+  { path:'/enterprise-green-services/overview', title:'绿色服务总览', menuLabel:'绿色服务总览', group:'企业绿色发展', roles:committee, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:true, order:2 },
+  { path:'/enterprise-green-services/management', title:'绿色服务管理', menuLabel:'绿色服务管理', group:'企业绿色发展', roles:committee, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:true, order:3 },
+  { path:'/enterprise-green-services/results', title:'绿色服务成果', menuLabel:'绿色服务成果', group:'企业绿色发展', roles:committee, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:true, order:4 },
+  { path:'/enterprise-profile', title:'企业绿色画像', menuLabel:'企业绿色画像', group:'企业绿色发展', roles:committee, pageType:'module', menuVisible:true, order:1 },
+  { path:'/zero-carbon-path-simulation', title:'零碳路径推演', menuLabel:'零碳路径推演', group:'园区零碳管理', roles:committee, pageType:'module', menuVisible:true, order:5 },
   { path:'/green-service-center', title:'绿色服务中心', menuLabel:'绿色服务中心', group:'企业绿色服务', roles:enterprise, pageType:'professional', menuVisible:true, order:1 },
   { path:'/organization-carbon', title:'组织碳管理', menuLabel:'组织碳管理', group:'企业绿色服务', roles:enterprise, pageType:'professional', menuVisible:false, order:2 },
   { path:'/product-carbon-footprint', title:'产品碳足迹', menuLabel:'产品碳足迹', group:'企业绿色服务', roles:enterprise, pageType:'professional', menuVisible:false, order:3 },
@@ -49,7 +50,7 @@ export const pageRoutes = [
 ]
 
 export function getMenuGroups(role) {
-  const order = role === 'enterprise' ? ['企业协同任务','企业绿色服务','双碳知识服务','数据管理'] : role === 'admin' ? ['系统管理','数据管理'] : ['园区零碳管理','企业绿色服务','双碳知识服务','数据管理']
+  const order = role === 'enterprise' ? ['企业协同任务','企业绿色服务','双碳知识服务','数据管理'] : role === 'admin' ? ['系统管理','数据管理'] : ['园区零碳管理','企业绿色发展','双碳知识服务','数据管理']
   const visible = pageRoutes.filter(route => route.menuVisible && route.roles.includes(role) && (!route.menuVisibleRoles || route.menuVisibleRoles.includes(role)))
   return order.map(group => {
     const groupRoutes = visible.filter(route => (route.groups?.[role] || route.group) === group)

@@ -8,7 +8,7 @@ import { StatusTag } from '../components/StatusTag.jsx'
 import { enterprises, energyCarbonData, enterpriseIndicatorResult, indicators, useSharedData } from '../mock/sharedStore.js'
 import { EnergyCarbonMonitoringPage } from './EnergyCarbonMonitoringPage.jsx'
 
-const moduleTabs=[{value:'overview',label:'能碳监测总览'},{value:'energy',label:'能源分析'},{value:'carbon',label:'碳排放分析'}]
+const moduleTabs=[{value:'overview',label:'园区能碳总览'},{value:'energy',label:'园区能源分析'},{value:'carbon',label:'园区碳排分析'}]
 const monthLabels=['1月','2月','3月','4月','5月','6月','7月']
 const energySeries=[{label:'综合能耗',color:'#2f6f4e',values:[142000,148000,151000,158000,161000,169000,179000]},{label:'绿色电力消费',color:'#4c91a7',values:[102000,109000,113000,121000,126000,134000,145000]}]
 const carbonSeries=[{label:'总排放',color:'#b2762d',values:[137000,140000,145000,148000,152000,155000,160000]},{label:'范围一',color:'#a95b4a',values:[31000,32000,32600,33500,34200,34900,35600]},{label:'范围二',color:'#6c8d7a',values:[106000,108000,112400,114500,117800,120100,124400]}]
@@ -17,18 +17,18 @@ const carbonStructure=[{label:'范围一',value:22,color:'#b2762d'},{label:'范�
 const changeByEnterprise={'ent-001':-3.2,'ent-002':-2.4,'ent-003':-1.7,'ent-004':8.2,'ent-005':4.1,'ent-006':6.4}
 const enterpriseTypes={'ent-001':'重点企业','ent-002':'绿色工厂','ent-003':'重点企业','ent-004':'零碳工厂','ent-005':'绿色工厂','ent-006':'重点企业'}
 
-export function EnergyCarbonModulePage(){
-  const {search}=useLocation(); const requestedTab=new URLSearchParams(search).get('tab'); const [tab,setTab]=useState(['energy','carbon','overview'].includes(requestedTab)?requestedTab:'overview'); const navigate=useNavigate()
+export function EnergyCarbonModulePage({ embedded=false, initialTab='overview' }){
+  const {search}=useLocation(); const requestedTab=new URLSearchParams(search).get('tab'); const activeTab=embedded ? initialTab : requestedTab; const [tab,setTab]=useState(['energy','carbon','overview'].includes(activeTab)?activeTab:'overview'); const navigate=useNavigate()
   const [enterpriseType,setEnterpriseType]=useState('全部企业'); const [focusType,setFocusType]=useState('全部')
-  useEffect(()=>{setTab(['energy','carbon','overview'].includes(requestedTab)?requestedTab:'overview')},[requestedTab])
+  useEffect(()=>{if(!embedded)setTab(['energy','carbon','overview'].includes(requestedTab)?requestedTab:'overview')},[embedded,requestedTab])
   const {tasks,role}=useSharedData()
   if(role==='enterprise') return <EnergyCarbonMonitoringPage enterpriseMode />
-  const change=value=>navigate(`/energy-carbon-monitoring?tab=${value}`)
+  const change=value=>embedded ? setTab(value) : navigate(`/energy-carbon-monitoring?tab=${value}`)
   const totalEnergy=energyCarbonData.reduce((sum,item)=>sum+item.energy,0); const totalCarbon=energyCarbonData.reduce((sum,item)=>sum+item.emissions,0); const cleanIndicator=indicators.find(item=>item.indicatorId==='ind-clean-energy'); const averageClean=Number.parseFloat(cleanIndicator?.value)||0; const carbonIntensity=totalEnergy?(totalCarbon/totalEnergy).toFixed(3):'—'
   const rows=useMemo(()=>energyCarbonData.map(item=>{const enterprise=enterprises.find(x=>x.id===item.enterpriseId);const task=[...tasks].reverse().find(x=>x.enterpriseId===item.enterpriseId&&x.status!=='已关闭');const changeValue=changeByEnterprise[item.enterpriseId]||0;const cleanRate=Number.parseFloat(enterpriseIndicatorResult.find(result=>result.enterpriseId===item.enterpriseId&&result.indicatorId==='ind-clean-energy')?.value);const reason=Number.isFinite(cleanRate)&&cleanRate<75?'清洁能源占比偏低':changeValue>=6?'能碳增长较快':task&&(task.pendingData||task.pendingVoucher)?'数据异常':'关注正常';return {...item,enterprise,task,cleanRate:Number.isFinite(cleanRate)?cleanRate:null,enterpriseType:enterpriseTypes[item.enterpriseId]||'一般企业',changeValue,reason}}).sort((a,b)=>b.energy-a.energy),[tasks])
   const filteredRows=useMemo(()=>rows.filter(item=>{if(enterpriseType!=='全部企业'&&item.enterpriseType!==enterpriseType)return false;if(focusType==='能耗TOP')return item.energy>=[...rows].sort((a,b)=>b.energy-a.energy)[2]?.energy;if(focusType==='碳排TOP')return item.emissions>=[...rows].sort((a,b)=>b.emissions-a.emissions)[2]?.emissions;if(focusType==='清洁能源占比偏低')return item.cleanRate!==null&&item.cleanRate<75;if(focusType==='数据异常')return item.reason==='数据异常';return true}),[rows,enterpriseType,focusType])
   const completeCount=rows.filter(item=>item.task&&item.task.pendingData===0&&item.task.pendingVoucher===0).length; const pendingData=rows.reduce((sum,item)=>sum+(item.task?.pendingData||0),0); const pendingVoucher=rows.reduce((sum,item)=>sum+(item.task?.pendingVoucher||0),0)
-  return <div className="content energy-overview-page"><PageHeader title="园区能碳监测" subtitle="园区能碳态势综合监测入口，聚焦总量、结构、重点企业与数据保障。" /><Tabs tabs={moduleTabs} active={tab} onChange={change}/>{tab==='overview'?<>
+  return <div className={embedded ? 'energy-overview-page' : 'content energy-overview-page'}>{!embedded && <PageHeader title="园区能碳监测" subtitle="园区能碳态势综合监测入口，聚焦总量、结构、重点企业与数据保障。" />}{!embedded && <Tabs tabs={moduleTabs} active={tab} onChange={change}/>} {tab==='overview'?<>
     <DataPanel title="园区能碳概况" description="2026年1—7月园区累计结果，统一呈现核心能碳指标与碳资产情况。"><MetricStrip metrics={[{label:'综合能源消费',value:`${(totalEnergy*10000).toLocaleString()} tce`,note:'累计 · 同比 ↓ 2.1%'},{label:'碳排放总量',value:`${(totalCarbon*10000).toLocaleString()} tCO₂e`,note:'累计 · 同比 ↓ 1.6%'},{label:'清洁能源消费占比',value:`${averageClean.toFixed(1)}%`,note:'同比 ↑ 2.4%'},{label:'单位能耗碳排放',value:`${carbonIntensity} tCO₂e/tce`,note:'按累计能碳结果计算'}]} /><div className="carbon-assets"><QuotaCard/><div className="certificate-card"><span>绿证</span><b>12,680</b><small>张 · 已核销 8,420 张</small></div></div></DataPanel>
     <AnalysisSection title="能耗情况" description="能源消费规模与来源结构，趋势数据均以 tce 计。" series={energySeries} structure={energyStructure} total={`${(totalEnergy*10000).toLocaleString()} tce`} trendTitle="能耗趋势" structureTitle="能源结构" />
     <AnalysisSection title="碳排放情况" description="排放总量、范围构成及其月度变化，趋势数据均以 tCO₂e 计。" series={carbonSeries} structure={carbonStructure} total={`${(totalCarbon*10000).toLocaleString()} tCO₂e`} trendTitle="碳排趋势" structureTitle="排放结构" carbon />

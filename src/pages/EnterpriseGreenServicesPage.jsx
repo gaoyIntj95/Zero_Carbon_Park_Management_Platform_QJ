@@ -109,7 +109,7 @@ export function EnterpriseGreenServicesPage() {
   const scopedAssets = carbonAssets.filter(item => item.applicable && (role === 'committee' || item.enterpriseId === currentEnterpriseId))
   if (role === 'enterprise') return <div className="content enterprise-content"><EnterpriseWorkbench scopedServices={scopedServices} scopedAssets={scopedAssets} currentEnterpriseId={currentEnterpriseId} navigate={navigate} /></div>
   const view = location.pathname.endsWith('/management') ? 'management' : location.pathname.endsWith('/results') ? 'results' : 'overview'
-  const pageMeta = { overview:['服务总览','查看企业服务覆盖与整体进度。'], management:['服务管理','维护服务目录，并集中处理待推进事项。'], results:['服务成果','查看已完成服务形成的报告、认证成果和管理台账。'] }
+  const pageMeta = { overview:['绿色服务总览','查看企业服务覆盖与整体进度。'], management:['绿色服务管理','维护服务目录，并集中处理待推进事项。'], results:['绿色服务成果','查看已完成服务形成的报告、认证成果和管理台账。'] }
   const [title, subtitle] = pageMeta[view]
   return <div className="content service-hub-page"><PageHeader title={title} subtitle={subtitle} />{view === 'overview' && <CommitteeOverview scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}{view === 'management' && <ServiceManagement scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}{view === 'results' && <ServiceResultsMatrix scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}</div>
 }

@@ -3,6 +3,7 @@ import { PageHeader } from '../components/PageHeader.jsx'
 import { MetricStrip } from '../components/MetricStrip.jsx'
 import { DataPanel } from '../components/DataPanel.jsx'
 import { StatusTag } from '../components/StatusTag.jsx'
+import { Tabs } from '../components/Tabs.jsx'
 import { carbonAssets, getEnergyCarbonRecord, enterprises, greenServices, useSharedData } from '../mock/sharedStore.js'
 
 const enterpriseName = id => enterprises.find(item => item.id === id)?.name || '—'
@@ -109,7 +110,6 @@ export function EnterpriseGreenServicesPage() {
   const scopedAssets = carbonAssets.filter(item => item.applicable && (role === 'committee' || item.enterpriseId === currentEnterpriseId))
   if (role === 'enterprise') return <div className="content enterprise-content"><EnterpriseWorkbench scopedServices={scopedServices} scopedAssets={scopedAssets} currentEnterpriseId={currentEnterpriseId} navigate={navigate} /></div>
   const view = location.pathname.endsWith('/management') ? 'management' : location.pathname.endsWith('/results') ? 'results' : 'overview'
-  const pageMeta = { overview:['绿色服务总览','查看企业服务覆盖与整体进度。'], management:['绿色服务管理','维护服务目录，并集中处理待推进事项。'], results:['绿色服务成果','查看已完成服务形成的报告、认证成果和管理台账。'] }
-  const [title, subtitle] = pageMeta[view]
-  return <div className="content service-hub-page"><PageHeader title={title} subtitle={subtitle} />{view === 'overview' && <CommitteeOverview scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}{view === 'management' && <ServiceManagement scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}{view === 'results' && <ServiceResultsMatrix scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}</div>
+  const changeView = next => navigate(`/enterprise-green-services/${next}`)
+  return <div className="content service-hub-page"><PageHeader title="企业绿色服务" subtitle="统一查看企业绿色服务覆盖、办理进度和服务成果。" /><Tabs tabs={[{ value:'overview', label:'服务总览' }, { value:'management', label:'服务管理' }, { value:'results', label:'服务成果' }]} active={view} onChange={changeView} />{view === 'overview' && <CommitteeOverview scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}{view === 'management' && <ServiceManagement scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}{view === 'results' && <ServiceResultsMatrix scopedServices={scopedServices} scopedAssets={scopedAssets} navigate={navigate} />}</div>
 }

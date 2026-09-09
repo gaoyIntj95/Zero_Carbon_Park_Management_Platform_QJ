@@ -45,3 +45,4 @@
 .trend-chart-legend-multi b{font-size:16px;margin-left:auto}
 .trend-chart-legend-multi small{font-size:10px}
 @media(max-width:760px){.trend-chart-legend-multi{grid-template-columns:1fr;gap:7px}.trend-chart-legend-multi span{max-width:260px}}
+.review-action-hint{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:11px 12px;border:1px solid #f0dfb4;border-radius:7px;background:#fffaf0;color:#765e2b;font-size:12px;line-height:1.5}.review-action-hint b{flex:none;color:#9a6a18}.review-action-hint span{color:#806d48}.review-modal-foot{justify-content:space-between}.review-modal-foot:before{content:'请完成审核判断后提交操作';align-self:center;color:#7b877f;font-size:11px}.review-return{border-color:#e5c98f;color:#986b1e;background:#fffaf0}.review-return:hover{border-color:#d6ad61;background:#fff7e7}

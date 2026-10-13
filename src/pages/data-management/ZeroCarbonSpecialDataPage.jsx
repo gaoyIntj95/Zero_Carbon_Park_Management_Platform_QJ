@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PageHeader } from '../../components/PageHeader.jsx'
 import { DataPanel } from '../../components/DataPanel.jsx'
 import { Tabs } from '../../components/Tabs.jsx'
@@ -44,17 +44,27 @@ function Rate({ numerator, denominator, target }) { const status = achievement(n
 function DetailGrid({ children }) { return <div className="dm-detail-grid">{children}</div> }
 function DetailItem({ label, children, wide = false }) { return <div className={wide ? 'wide' : ''}><label>{label}</label><b>{children}</b></div> }
 
-export function ZeroCarbonSpecialDataPage() {
-  const [category, setCategory] = useState('efficiency')
+export function ZeroCarbonSpecialDataPage({ enterpriseRows = [], enterpriseMode = false, currentEnterpriseId, section = 'all' }) {
+  const scopedCategories = section === 'resource' ? categories.filter(item => item.value === 'resource') : section === 'zero-carbon' ? categories.filter(item => item.value !== 'resource') : categories
+  const enterprise = enterpriseRows.find(item => item.enterpriseId === currentEnterpriseId)
+  const enterpriseKeyword = ['晶澳', '隆基', '阳光', '润阳', '亿纬'].find(item => enterprise?.name.includes(item)) || ''
+  const [category, setCategory] = useState(scopedCategories[0]?.value || 'efficiency')
   const [detail, setDetail] = useState(null)
-  const active = categories.find(item => item.value === category) || categories[0]
-  const rows = useMemo(() => specialData[category], [category])
+  useEffect(() => {
+    setCategory(scopedCategories[0]?.value || 'efficiency')
+    setDetail(null)
+  }, [section])
+  const active = scopedCategories.find(item => item.value === category) || scopedCategories[0]
+  const rows = useMemo(() => (specialData[category] || []).filter(item => !enterpriseMode || !enterpriseKeyword || item.enterprise.includes(enterpriseKeyword)), [category, enterpriseMode, enterpriseKeyword])
   const view = category === 'efficiency' ? <Table headers={['企业', '适用产品数', '达标产品数', '产品能效状态', '能效诊断状态', '年度', '操作']} rows={rows.map(item => { const passed = item.products.filter(product => product.energy <= product.limit).length, status = energyStatus(item.products); return { key: item.enterprise, cells: [item.enterprise, item.products.length, passed, <StatusTag tone={statusTone(status)}>{status}</StatusTag>, <StatusTag tone={statusTone(item.diagnosis)}>{item.diagnosis}</StatusTag>, item.year, <button className="op-btn" onClick={() => setDetail(item)}>查看</button>] } })} />
     : category === 'resource' ? <Table headers={['企业', '工业固废利用率', '余热/余压利用率', '工业用水利用率', '年度', '操作']} rows={rows.map(item => ({ key: item.enterprise, cells: [item.enterprise, <Rate numerator={item.solidWaste?.[0]} denominator={item.solidWaste?.[1]} target={80} />, <Rate numerator={item.wasteHeat?.[0]} denominator={item.wasteHeat?.[1]} target={50} />, <Rate numerator={item.water?.[0]} denominator={item.water?.[1]} target={80} />, item.year, <button className="op-btn" onClick={() => setDetail(item)}>查看</button>] }))} />
     : category === 'building' ? <Table headers={['企业/数据主体', '已建设屋顶光伏面积', '可利用建筑屋顶面积', '屋顶光伏覆盖率', '绿色/超低能耗建筑数量', '新建建筑数量', '绿色建筑占比', '年度', '操作']} rows={rows.map(item => ({ key: item.enterprise, cells: [item.enterprise, item.pvBuilt == null ? '暂无数据' : `${item.pvBuilt.toLocaleString()} m²`, item.pvAvailable == null ? '暂无数据' : `${item.pvAvailable.toLocaleString()} m²`, <Rate numerator={item.pvBuilt} denominator={item.pvAvailable} target={50} />, item.greenBuildings == null ? '暂无数据' : `${item.greenBuildings} 栋`, item.newBuildings == null ? '暂无数据' : `${item.newBuildings} 栋`, <Rate numerator={item.greenBuildings} denominator={item.newBuildings} target={30} />, item.year, <button className="op-btn" onClick={() => setDetail(item)}>查看</button>] }))} />
     : category === 'transport' ? <Table headers={['企业/数据主体', '新能源交通运输工具数量', '纳入统计交通运输工具总数量', '新能源交通运输工具比例', '年度', '操作']} rows={rows.map(item => ({ key: item.enterprise, cells: [item.enterprise, `${item.newEnergy} 辆`, `${item.total} 辆`, <Rate numerator={item.newEnergy} denominator={item.total} target={60} />, item.year, <button className="op-btn" onClick={() => setDetail(item)}>查看</button>] }))} />
     : <Table headers={['企业', '碳足迹认证产品数量', '年度', '操作']} rows={rows.map(item => ({ key: item.enterprise, cells: [item.enterprise, `${item.products.length} 个`, item.year, <button className="op-btn" onClick={() => setDetail(item)}>查看</button>] }))} />
-  return <div className="content dm-page"><PageHeader title="零碳专项数据" subtitle="维护零碳园区指标计算、建设跟踪和验收支撑所需的专项基础数据。" /><Tabs tabs={categories} active={category} onChange={setCategory} /><DataPanel title={active.label} description="人工维护数量、面积和状态等原始数据；比例、覆盖率及达标状态由系统计算。">{view}</DataPanel><SpecialDataDetail category={category} item={detail} onClose={() => setDetail(null)} /></div>
+  const title = section === 'resource' ? '资源循环与绿色制造' : section === 'zero-carbon' ? '零碳专项建设' : '零碳专项数据'
+  const subtitle = enterpriseMode ? `${enterprise?.name || '当前企业'} · 按企业视角维护专项建设和评价所需的原始数据。` : '维护零碳园区指标计算、建设跟踪和验收支撑所需的专项基础数据。'
+  const greenManufacturing = enterpriseMode && section === 'resource' ? <DataPanel title="绿色制造成果" description="展示本企业绿色制造相关认定与材料状态。"><div className="material-summary"><span>绿色工厂 <b>{enterprise?.greenFactory ? '已认定' : '待补充'}</b></span><span>零碳工厂 <b>{enterprise?.zeroCarbonFactory ? '已建设' : '建设中'}</b></span><span>支撑材料 <b>{enterprise?.greenFactory ? '已归集' : '待补充'}</b></span></div></DataPanel> : null
+  return <div className="content dm-page"><PageHeader title={title} subtitle={subtitle} /><Tabs tabs={scopedCategories} active={category} onChange={setCategory} /><DataPanel title={active.label} description={enterpriseMode ? '仅展示本企业数据；比例、覆盖率及达标状态由系统计算。' : '人工维护数量、面积和状态等原始数据；比例、覆盖率及达标状态由系统计算。'}>{view}</DataPanel>{greenManufacturing}<SpecialDataDetail category={category} item={detail} onClose={() => setDetail(null)} /></div>
 }
 
 function SpecialDataDetail({ category, item, onClose }) {

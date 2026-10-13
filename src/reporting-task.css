@@ -1,4 +1,4 @@
-.enterprise-content .metric-strip{grid-template-columns:repeat(5,minmax(0,1fr))}
+.enterprise-content .metric-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
 .enterprise-content .report-action-table{min-width:1060px}
 .enterprise-content .report-action-table th:nth-child(1){width:17%}
 .enterprise-content .report-action-table th:nth-child(2){width:31%}
@@ -7,26 +7,29 @@
 .enterprise-content .report-action-table th:nth-child(5){width:8%}
 .enterprise-content .report-action-table th:nth-child(6){width:8%}
 .enterprise-content .report-action-table td{font-size:12px;line-height:1.55}
-.report-module-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px;background:#fafbfa}
-.report-module-card{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.report-module-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:14px 16px;background:#f7faf8;border-bottom:1px solid var(--line);border-left:4px solid var(--green)}
-.report-module-head b{font-size:15px;color:var(--green-dark)}
-.report-module-head p{margin:4px 0 0;font-size:11px;line-height:1.5;color:var(--muted)}
-.report-module-head>span{grid-column:2;grid-row:1;color:var(--muted);font-size:12px;white-space:nowrap}
-.report-module-head .op-btn{grid-column:2;grid-row:2;white-space:nowrap}
-.report-module-card .table-wrap{overflow:auto}
-.report-module-card .report-action-table{min-width:850px}
-@media(max-width:1100px){.report-module-grid{grid-template-columns:1fr}}
+.enterprise-content>.page-head{position:sticky;top:58px;z-index:4;margin:-12px 0 12px;padding:12px 0 10px;background:var(--bg)}
+.reporting-head-actions{display:flex;gap:8px;white-space:nowrap}
+.report-instruction{margin:12px 0 0;border:1px solid #dcebe2;border-radius:10px;background:#f7fbf9;color:#50675d;font-size:12px;line-height:1.65}
+.report-instruction summary{cursor:pointer;padding:12px 16px;color:var(--green-dark);font-weight:700}
+.report-instruction p{margin:0;padding:0 16px 12px}.report-instruction p+p{padding-top:0}
+.report-module-switcher{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0 0}
+.report-module-switcher button{min-height:92px;padding:14px 15px;border:1px solid #dce8e1;border-radius:10px;background:#fff;color:#587067;cursor:pointer;text-align:left;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
+.report-module-switcher button:hover{border-color:#94cbb0;background:#f8fcfa}.report-module-switcher button.active{border-color:#56ad82;background:linear-gradient(135deg,#effaf4,#fff);box-shadow:0 4px 12px rgba(37,105,75,.08)}
+.report-module-switcher b,.report-module-switcher span,.report-module-switcher small{display:block}.report-module-switcher b{color:#2e4940;font-size:14px}.report-module-switcher span{margin-top:10px;color:var(--green-dark);font-size:12px;font-weight:700}.report-module-switcher small{margin-top:4px;color:var(--muted);font-size:11px}
+.report-current-summary{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:#fbfdfc}.report-current-summary b{color:var(--green-dark);font-size:13px}.report-current-summary span{color:var(--muted);font-size:12px}
+.report-todo-summary{display:flex;align-items:center;gap:20px;padding:12px 16px;border-bottom:1px solid var(--line);background:#fbfdfc;color:var(--muted);font-size:12px}.report-todo-summary b{color:var(--green-dark);font-size:14px}.report-todo-summary span:last-child{margin-left:auto}.report-todo-table{min-width:1120px}.report-todo-table th{background:#f7faf8;color:#68776e;padding:11px 14px;text-align:left;font-size:12px}.report-todo-table td{padding:13px 14px;font-size:12px;line-height:1.55}.report-todo-table tbody tr:hover td{background:#f8fcf9}.report-todo-table .item-name{font-weight:650;color:var(--text)}.report-todo-table .table-subnote{display:block;margin-top:3px;color:var(--muted);font-size:11px;font-weight:400}
 
 @media(max-width:1100px){
-  .enterprise-content .metric-strip{grid-template-columns:repeat(3,1fr)}
-  .enterprise-content .metric-box:nth-child(3){border-right:0}
-  .enterprise-content .metric-box:nth-child(-n+3){border-bottom:1px solid var(--line)}
-}
-@media(max-width:640px){
-  .enterprise-content .metric-strip{grid-template-columns:1fr 1fr}
+  .enterprise-content .metric-strip{grid-template-columns:repeat(2,1fr)}
   .enterprise-content .metric-box:nth-child(2){border-right:0}
   .enterprise-content .metric-box:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .report-module-switcher{grid-template-columns:repeat(2,minmax(0,1fr))}.report-todo-summary{align-items:flex-start;flex-wrap:wrap;gap:8px 16px}.report-todo-summary span:last-child{margin-left:0;flex-basis:100%}
+}
+@media(max-width:640px){
+  .enterprise-content>.page-head{top:58px;align-items:stretch;flex-direction:column;gap:10px}.reporting-head-actions .btn{flex:1}
+  .enterprise-content .metric-strip,.report-module-switcher{grid-template-columns:1fr}
+  .enterprise-content .metric-box{border-right:0;border-bottom:1px solid var(--line)}.enterprise-content .metric-box:last-child{border-bottom:0}
+  .report-current-summary{align-items:flex-start;flex-direction:column;gap:4px}
 }
 
 /* 进度与审核表的列数不同，分别按实际列数等宽铺满，避免字段集中在中间列。 */
@@ -36,6 +39,24 @@
 .enterprise-task-table.progress-task-table td:nth-child(n){width:10%;overflow-wrap:anywhere}
 .enterprise-task-table.review-task-table th:nth-child(n),
 .enterprise-task-table.review-task-table td:nth-child(n){width:8.3333%;overflow-wrap:anywhere}
+
+/* 统一填报台账去掉截止日期后，按实际字段均匀分配列宽并给操作留出空间。 */
+.enterprise-task-table.task-ledger-table{min-width:1640px;width:100%;table-layout:fixed}
+.enterprise-task-table.task-ledger-table th:nth-child(1),.enterprise-task-table.task-ledger-table td:nth-child(1){width:21%}
+.enterprise-task-table.task-ledger-table th:nth-child(2),.enterprise-task-table.task-ledger-table td:nth-child(2){width:10%}
+.enterprise-task-table.task-ledger-table th:nth-child(n+3):nth-child(-n+6),.enterprise-task-table.task-ledger-table td:nth-child(n+3):nth-child(-n+6){width:7%}
+.enterprise-task-table.task-ledger-table th:nth-child(7),.enterprise-task-table.task-ledger-table td:nth-child(7){width:9%}
+.enterprise-task-table.task-ledger-table th:nth-child(8),.enterprise-task-table.task-ledger-table td:nth-child(8){width:9%}
+.enterprise-task-table.task-ledger-table th:nth-child(9),.enterprise-task-table.task-ledger-table td:nth-child(9){width:8%}
+.enterprise-task-table.task-ledger-table th:nth-child(10),.enterprise-task-table.task-ledger-table td:nth-child(10){width:9%}
+.enterprise-task-table.task-ledger-table th:nth-child(11),.enterprise-task-table.task-ledger-table td:nth-child(11){width:6%}
+.enterprise-task-table.task-ledger-table .task-ledger-enterprise,.enterprise-task-table.task-ledger-table .task-ledger-kind{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.enterprise-task-table.task-ledger-table th:last-child,.enterprise-task-table.task-ledger-table td:last-child{text-align:center}
+.modal.detail-modal{display:flex;flex-direction:column;max-height:88vh;overflow:hidden}
+.modal.detail-modal>.modal-body{min-height:0;overflow:auto;flex:1}
+.modal.detail-modal>.modal-foot{position:sticky;bottom:0;z-index:1;flex:none;background:#fff}
+.task-ledger-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 10px}
+.task-ledger-actions .op-btn{white-space:nowrap}
 
 /* 园区能碳总览趋势：三类指标同图展示，不再通过按钮切换。 */
 .trend-chart-legend-multi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:center;margin-bottom:8px}

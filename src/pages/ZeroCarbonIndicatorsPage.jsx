@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../components/PageHeader.jsx'
 import { FilterBar } from '../components/FilterBar.jsx'
 import { SummaryCard } from '../components/SummaryCard.jsx'
@@ -6,10 +7,10 @@ import { StatusTag } from '../components/StatusTag.jsx'
 import { SectionCard } from '../components/SectionCard.jsx'
 import { Modal } from '../components/Modal.jsx'
 import { Tabs } from '../components/Tabs.jsx'
-import { indicatorGroups, indicators } from '../mock/data/zeroCarbonIndicators.js'
-import { enterpriseIndicatorResult, useSharedData } from '../mock/sharedStore.js'
+import { indicatorGroups, indicators as indicatorDefinitions } from '../mock/data/zeroCarbonIndicators.js'
+import { enterpriseIndicatorResult, enterpriseEfficiencyBenchmarkResults, useSharedData } from '../mock/sharedStore.js'
 import { ScenarioPage } from './FocusPages.jsx'
-import { EnergyCarbonModulePage } from './EnergyCarbonModulePage.jsx'
+import { dashboardAnnualBaseline } from '../mock/dashboardAnnualBaseline.js'
 
 const categories = ['核心指标', '引导指标', '特色指标', '专项建设要求']
 const tone = status => status === '已达标' ? 'ok' : status === '待提升' ? 'warn' : 'gray'
@@ -20,7 +21,7 @@ export function ZeroCarbonIndicatorsPage() {
   if (role === 'committee') return <CommitteeIndicatorsPage />
   const enterpriseMode = role === 'enterprise'
   const ownIds = enterpriseIndicatorResult.filter(item => item.enterpriseId === currentEnterpriseId).map(item => item.indicatorId)
-  const viewIndicators = enterpriseMode ? indicators.filter(item => ownIds.includes(item.indicatorId)) : indicators
+  const viewIndicators = enterpriseMode ? indicatorDefinitions.filter(item => ownIds.includes(item.indicatorId)) : indicatorDefinitions
   const [category, setCategory] = useState('全部'), [status, setStatus] = useState('全部'), [dataStatus, setDataStatus] = useState('全部'), [detail, setDetail] = useState(null), [notice, setNotice] = useState('')
   const shown = useMemo(() => viewIndicators.filter(item => (category === '全部' || item.cat === category) && (status === '全部' || item.status === status) && (dataStatus === '全部' || item.data === dataStatus)), [viewIndicators, category, status, dataStatus])
   const summary = { total:viewIndicators.length, achieved:viewIndicators.filter(item => item.status === '已达标').length, pending:viewIndicators.filter(item => item.status === '待提升').length }
@@ -44,6 +45,7 @@ const parkStatusTone = item => parkDataPending(item) ? 'warn' : parkTone(item.st
 const parkValue = (item, key) => `${item[key]}${item[key] === '—' ? '' : item[key === 'value' ? 'unit' : 'targetUnit'] ? ` ${item[key === 'value' ? 'unit' : 'targetUnit']}` : ''}`
 
 function LegacyCommitteeIndicatorsPage() {
+  const indicators = indicatorDefinitions
   const [category, setCategory] = useState('全部'), [achievement, setAchievement] = useState('全部'), [dataStatus, setDataStatus] = useState('全部')
   const [detail, setDetail] = useState(null), [config, setConfig] = useState(null), [basis, setBasis] = useState(false), [alert, setAlert] = useState(null), [view, setView] = useState('indicators'), [notice, setNotice] = useState('')
   const shown = indicators.filter(item => (category === '全部' || item.cat === category) && (achievement === '全部' || item.status === achievement) && (dataStatus === '全部' || item.data === dataStatus))
@@ -52,8 +54,12 @@ function LegacyCommitteeIndicatorsPage() {
 }
 
 function CommitteeIndicatorsPage() {
+  const navigate = useNavigate()
   const [achievement, setAchievement] = useState('全部'), [dataStatus, setDataStatus] = useState('全部')
-  const [detail, setDetail] = useState(null), [config, setConfig] = useState(null), [basis, setBasis] = useState(false), [alert, setAlert] = useState(null), [view, setView] = useState('indicators'), [notice, setNotice] = useState('')
+  const [detail, setDetail] = useState(null), [config, setConfig] = useState(null), [basis, setBasis] = useState(false), [alert, setAlert] = useState(null), [notice, setNotice] = useState('')
+  const benchmarkRows = enterpriseEfficiencyBenchmarkResults.filter(item => item.dataStatus === 'official')
+  const benchmarkRate = benchmarkRows.length ? benchmarkRows.filter(item => item.result !== 'not_compliant').length / benchmarkRows.length * 100 : 0
+  const indicators = indicatorDefinitions.map(item => item.indicatorId === 'ind-product-energy' ? { ...item, value:`${benchmarkRate.toFixed(1)}%`, status:benchmarkRate >= 100 ? '已达标' : '待提升', gap:benchmarkRate >= 100 ? '已达到二级限额' : '存在未达标企业', data:benchmarkRows.length ? '正常' : '待补充', period:'2026年1—7月' } : item)
   const shown = indicators.filter(item => (achievement === '全部' || item.status === achievement) && (dataStatus === '全部' || item.data === dataStatus))
   const statusSummary = {
     achieved: indicators.filter(item => !parkDataPending(item) && item.status === '已达标').length,
@@ -62,15 +68,15 @@ function CommitteeIndicatorsPage() {
   }
   const openDetail = item => setDetail({ ...item, status: parkStatus(item) })
   return <div className="content">
-    <PageHeader title="零碳园区总览" subtitle="统一展示园区零碳指标、能碳态势与数据支撑情况。" actions={view === 'indicators' && <button className="btn" onClick={() => setConfig('open')}>指标设置</button>} />
+    <PageHeader title="零碳指标总览" subtitle="聚焦零碳园区12项评价指标、建设要求、数据状态和待提升事项。" actions={<button className="btn" onClick={() => setConfig('open')}>指标设置</button>} />
     {notice && <div className="notice success">{notice}</div>}
-    <Tabs tabs={[{ value:'indicators', label:'园区零碳指标' }, { value:'overview', label:'园区能碳总览' }, { value:'energy', label:'园区能源分析' }, { value:'carbon', label:'园区碳排分析' }]} active={view} onChange={setView}/>
-    {view === 'indicators' ? <><FilterBar action={<button className="basis-link" onClick={() => setBasis(true)}>查看指标依据 ›</button>}><span className="label">统计年度</span><select defaultValue="2026"><option>2026</option><option>2025</option></select></FilterBar>
+    <FilterBar action={<button className="basis-link" onClick={() => setBasis(true)}>查看指标依据 ›</button>}><span className="label">统计年度</span><select defaultValue="2026"><option>2026</option><option>2025</option></select></FilterBar>
     <>
+      <div className="zero-carbon-summary"><button onClick={() => navigate('/energy-carbon-monitoring/overview')}><span>综合能耗</span><b>{dashboardAnnualBaseline.energy.total.toFixed(2)} 万tce</b><small>{dashboardAnnualBaseline.period} · 进入能碳分析 →</small></button><button onClick={() => navigate('/energy-carbon-monitoring/overview')}><span>单位能耗碳排</span><b>{dashboardAnnualBaseline.carbon.intensity.toFixed(4)} tCO₂e/tce</b><small>{dashboardAnnualBaseline.period} · 进入能碳分析 →</small></button><button onClick={() => navigate('/energy-carbon-monitoring/overview')}><span>光伏自发自用率</span><b>{dashboardAnnualBaseline.solar.selfUseRate}%</b><small>装机 {dashboardAnnualBaseline.solar.installedMW} MW · 发电量 {dashboardAnnualBaseline.solar.generationWanKwh} 万kWh</small></button><button onClick={() => navigate('/energy-carbon-monitoring/overview')}><span>碳排放总量</span><b>{dashboardAnnualBaseline.carbon.total.toFixed(2)} 万tCO₂e</b><small>{dashboardAnnualBaseline.period} · 进入能碳分析 →</small></button></div>
       <div className="overview"><SummaryCard className="overview-main"><div className="overview-top"><div><div className="overview-title">零碳评价指标</div><div className="overview-number">{indicators.length}<small>项</small></div></div><div className="overview-status"><Stat label="已达标" value={statusSummary.achieved} className="ok"/><Stat label="待提升" value={statusSummary.pending} className="warn"/><Stat label="数据待补充" value={statusSummary.dataPending} className="warn"/></div></div><div className="distribution"><span className="ok" style={{width:`${statusSummary.achieved / indicators.length * 100}%`}}/><span className="warn" style={{width:`${(statusSummary.pending + statusSummary.dataPending) / indicators.length * 100}%`}}/></div><div className="distribution-legend"><span><i className="ok"/>已达标 {statusSummary.achieved}项</span><span><i className="warn"/>待提升 {statusSummary.pending}项</span>{statusSummary.dataPending > 0 && <span><i className="warn"/>数据待补充 {statusSummary.dataPending}项</span>}</div><div className="levels">{parkCategories.map(group => { const rows = indicators.filter(item => item.cat === group), achieved = rows.filter(item => !parkDataPending(item) && item.status === '已达标').length, pending = rows.filter(item => !parkDataPending(item) && item.status === '待提升').length, dataPending = rows.filter(parkDataPending).length; return <div className="level" key={group}><div className="level-head"><b>{group === '特色指标' ? '云南特色指标' : group}</b><strong>{achieved} / {rows.length}</strong></div><div className="level-track"><i className="ok" style={{width:`${achieved / rows.length * 100}%`}}/><i className="warn" style={{width:`${(pending + dataPending) / rows.length * 100}%`}}/></div><span>{[pending && `${pending}项待提升`, dataPending && `${dataPending}项数据待补充`].filter(Boolean).join('，') || '全部达标'}</span></div>})}</div></SummaryCard><SummaryCard className="overview-side"><div className="attention-head"><div className="attention-title">当前需要关注</div><div className="attention-count">4项</div></div><div className="attention-list">{[indicators[1], indicators[2], indicators[10], indicators[11]].map(item => <button className="attention-row" key={item.indicatorId} onClick={() => openDetail(item)}><div><div className="attention-name">{item.name}</div><div className="attention-desc">{parkDataPending(item) ? '当前数据待补充' : `当前${item.value}，目标${item.target}`}</div></div><StatusTag tone={parkStatusTone(item)}>{parkStatus(item)}</StatusTag></button>)}</div></SummaryCard></div>
       <div className="workspace"><div className="tools"><div className="filter-row"><div className="filter-item"><span>达标状态</span><select value={achievement} onChange={event => setAchievement(event.target.value)}><option>全部</option><option>已达标</option><option>待提升</option></select></div><div className="filter-item"><span>数据状态</span><select value={dataStatus} onChange={event => setDataStatus(event.target.value)}><option>全部</option><option>正常</option><option>待补充</option></select></div></div><div className="result-hint">当前显示 {shown.length} 项</div></div><div className="sections">{parkCategories.map(group => { const rows = shown.filter(item => item.cat === group); if (!rows.length) return null; return <SectionCard key={group} title={indicatorGroups[group].title} count={rows.length} desc={indicatorGroups[group].desc}><div className="table-wrap"><table><thead><tr><th>指标名称</th><th>当前值</th><th>目标值</th><th>差距</th><th>达标状态</th><th>数据状态</th><th>数据期间</th><th>操作</th></tr></thead><tbody>{rows.map(item => <tr key={item.indicatorId}><td className="item-name">{item.name}</td><td>{parkValue(item,'value')}</td><td>{parkValue(item,'target')}</td><td className={parkStatusTone(item)}>{item.gap}</td><td><StatusTag tone={parkStatusTone(item)}>{parkStatus(item)}</StatusTag></td><td>{parkDataPending(item) ? '数据待补充' : item.data}</td><td>{item.period}</td><td><button className="op-btn" onClick={() => openDetail(item)}>查看</button><button className="op-btn" onClick={() => setConfig(item)}>修改</button></td></tr>)}</tbody></table></div></SectionCard>})}</div><div className="footnote">差距仅显示数值，具体含义结合目标值和达标状态判断；数据缺失时显示“数据待补充”。</div></div>
       <ParkDetail item={detail} onClose={() => setDetail(null)} onAlert={() => setAlert(detail)}/><ParkConfig open={!!config} item={config === 'open' ? null : config} onClose={() => setConfig(null)} onSaved={() => { setConfig(null); setNotice('指标配置已保存，当前页面将继续按平台正式指标结果展示。') }}/><BasisModal open={basis} onClose={() => setBasis(false)}/><AlertModal item={alert} onClose={() => setAlert(null)} onConfirm={() => setNotice(`已记录“${alert?.name || '当前指标'}”的预警处置。`)}/>
-    </></> : <EnergyCarbonModulePage key={view} embedded initialTab={view} />}
+    </>
   </div>
 }
 

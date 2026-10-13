@@ -15,6 +15,8 @@
 
 body { background: var(--bg); color: var(--text); }
 .sidebar { background: #163443; color: #e0eeee; }
+.sidebar { display: flex; flex-direction: column; }
+.sidebar .menu { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .brand small { color: #8ba5ab; }
 .menu-group { color: #82aaa9; }
 .menu-item.active { background: #229c8f; }
@@ -64,7 +66,10 @@ select { border-color: #cfe0e0; color: #26404b; }
 .enterprise-service-status span { margin-top:4px; color:var(--muted); font-size:12px; }
 .enterprise-service-tip { color:var(--muted); font-size:12px; line-height:1.6; padding-left:8px; }
 .green-service-task-list { padding:0 16px; }
-.op-link{color:var(--green-dark);font-size:12px;font-weight:650;white-space:nowrap}.service-catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}.service-catalog-card{box-shadow:none;padding:15px;min-height:176px}.service-catalog-card p{min-height:42px;line-height:1.6}.service-catalog-card .text-link{display:block;border:0;background:transparent;color:var(--green-dark);padding:8px 0 0;font-size:11px;cursor:pointer}.service-catalog-card .text-link:hover{color:var(--green)}.service-result-note{display:flex;gap:16px;align-items:center;margin:0 16px 16px;padding:12px 14px;background:var(--green-pale);border:1px solid #d8eeea;border-radius:8px;font-size:12px}.service-result-note span{color:var(--muted)}
+.op-link{color:var(--green-dark);font-size:12px;font-weight:650;white-space:nowrap}.service-catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px}.service-catalog-card{box-shadow:none;padding:15px;min-height:176px;display:flex;flex-direction:column}.service-catalog-card p{min-height:42px;line-height:1.6;flex:1}.service-catalog-card .text-link{display:block;border:0;background:transparent;color:var(--green-dark);padding:8px 0 0;font-size:11px;cursor:pointer}.service-catalog-card .text-link:hover{color:var(--green)}.service-result-note{display:flex;gap:16px;align-items:center;margin:0 16px 16px;padding:12px 14px;background:var(--green-pale);border:1px solid #d8eeea;border-radius:8px;font-size:12px}.service-result-note span{color:var(--muted)}
+.enterprise-service-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;padding:5px;margin:16px 26px 0;background:#eaf1ec;border:1px solid #dce7df;border-radius:10px}.enterprise-service-nav button{border:0;background:transparent;color:#5d6c63;padding:10px 8px;border-radius:7px;cursor:pointer;font-size:13px}.enterprise-service-nav button:hover{background:#f8fbf9;color:var(--green)}.enterprise-service-nav button.active{background:#fff;color:var(--green-dark);font-weight:700;box-shadow:0 1px 4px rgba(34,55,43,.08)}
+.enterprise-service-subnav{display:flex;gap:4px;align-items:center;overflow-x:auto;padding:0 6px;margin:0 26px 14px;border:1px solid #dce7df;border-top:0;border-radius:0 0 10px 10px;background:#fff}.enterprise-service-subnav button{border:0;border-bottom:2px solid transparent;background:transparent;color:#64736a;padding:10px 14px;white-space:nowrap;cursor:pointer;font-size:13px}.enterprise-service-subnav button:hover{color:var(--green)}.enterprise-service-subnav button.active{color:var(--green-dark);border-bottom-color:var(--green);font-weight:700}
+.enterprise-service-subnav.standalone{margin-top:16px;border-top:1px solid #dce7df;border-radius:10px}
 .green-service-task,.green-next-item { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:16px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line); }
 .green-service-task:last-child,.green-next-item:last-child { border-bottom:0; }
 .green-service-task b,.green-service-task small,.green-next-item b,.green-next-item small { display:block; }
@@ -73,6 +78,7 @@ select { border-color: #cfe0e0; color: #26404b; }
 .green-next-item { grid-template-columns:auto minmax(0,1fr) auto; padding:13px 16px; }
 .priority-dot { display:flex; width:24px; height:24px; align-items:center; justify-content:center; border-radius:50%; background:var(--green-soft); color:var(--green-dark); font-weight:700; font-size:12px; }
 .priority-dot.warn { background:var(--amber-soft); color:var(--amber); }
+@media(max-width:1200px){.enterprise-service-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.green-service-overview{grid-template-columns:1fr}.green-service-insight{grid-template-columns:1fr}.enterprise-service-status{grid-template-columns:repeat(3,1fr)}.enterprise-service-tip{grid-column:1/-1;padding-left:0}.service-entry-grid{grid-template-columns:1fr}.service-progress-table{min-width:760px}.service-catalog-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.service-catalog-grid{grid-template-columns:1fr}.service-result-note{display:block}.service-result-note span{display:block;margin-top:5px}}
 
@@ -125,3 +131,6 @@ select { border-color: #cfe0e0; color: #26404b; }
 /* 填报任务管理的企业任务字段等宽铺满表格画布。 */
 .enterprise-task-table { min-width: 1440px; table-layout: fixed; }
 .enterprise-task-table th:nth-child(n), .enterprise-task-table td:nth-child(n) { width: 11.111%; overflow-wrap: anywhere; }
+
+/* 园区企业绿色服务工作台：把原有分散页签收敛为一页，优先呈现覆盖、待办与归档。 */
+.service-hub-page{max-width:1580px}.service-hub-page>.page-head{margin-bottom:18px}.service-hub-page>.metric-strip{margin:0 0 14px}.service-hub-page .green-service-overview{margin:0 0 14px}.service-hub-page .data-panel{margin-bottom:14px}.service-hub-page .data-panel:last-child{margin-bottom:0}.service-hub-page .green-service-insight{padding-bottom:10px}.service-hub-page .green-service-bar{cursor:default}.service-hub-page .green-service-bar:hover span{color:var(--text)}.service-hub-page .green-service-bar i{display:block}.service-progress-table{min-width:1080px!important;table-layout:fixed}.service-progress-table th:nth-child(1){width:13%}.service-progress-table th:nth-child(2){width:25%}.service-progress-table th:nth-child(3){width:13%}.service-progress-table th:nth-child(4){width:24%}.service-progress-table th:nth-child(5){width:13%}.service-progress-table th:nth-child(6){width:12%}.service-coverage-tags{display:flex;flex-wrap:wrap;gap:5px}.service-coverage-tags span,.service-result-count{display:inline-flex;align-items:center;border-radius:999px;background:var(--green-pale);color:var(--green-dark);font-size:11px;font-weight:650;line-height:1;padding:5px 8px}.service-result-count{background:#eef6f4}.service-hub-page .green-service-alerts{min-height:166px}.service-hub-page .green-service-alert{padding:12px 0}.service-hub-page .green-service-bars{padding-bottom:15px}

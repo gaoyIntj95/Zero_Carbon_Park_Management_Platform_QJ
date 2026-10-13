@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useMemo, useState } from 'react'
 import { enterprises } from './masterData.js'
 import { businessDataRecords, energyNodes } from './dataManagementStore.js'
+import { enterpriseEnergyResults, enterpriseEfficiencyBenchmarkResults, enterpriseEnergyFlowResults, enterpriseEnergyOptimizationResults, enterpriseEnergyCarbonBudgetResults, enterpriseCarbonResults } from './energyCarbonResults.js'
 import { indicators as indicatorDefinitions } from './data/zeroCarbonIndicators.js'
 import { useDataManagement } from './DataManagementContext.jsx'
 
 export { enterprises }
-export const energyCarbonData = enterprises.map(enterprise => {
-  const total=businessDataRecords.find(item=>item.enterpriseId===enterprise.enterpriseId&&item.dataItemCode==='ENERGY_TOTAL')
-  const electricity=businessDataRecords.find(item=>item.enterpriseId===enterprise.enterpriseId&&item.dataItemCode==='ENERGY_ELECTRICITY')
-  const carbon=businessDataRecords.filter(item=>item.enterpriseId===enterprise.enterpriseId&&item.period==='2026-07'&&['CARBON_SCOPE1','CARBON_SCOPE2'].includes(item.dataItemCode)).reduce((sum,item)=>sum+Number(item.value||0),0)
-  return { id:total?.sourceRecordId||`ec-${enterprise.enterpriseId}`, enterpriseId:enterprise.enterpriseId, periodType:'monthRange', startMonth:'2026-01', endMonth:'2026-07', energy:total?.value, electricity:electricity?.value, emissions:carbon, cleanRate:null }
+export { enterpriseEnergyResults, enterpriseEfficiencyBenchmarkResults, enterpriseEnergyFlowResults, enterpriseEnergyOptimizationResults, enterpriseEnergyCarbonBudgetResults, enterpriseCarbonResults }
+export const energyCarbonData = enterpriseEnergyResults.map(result => {
+  const electricity = result.energyConsumption.find(item => item.energyType === 'electricity')
+  const carbon = enterpriseCarbonResults.find(item => item.enterpriseId === result.enterpriseId)
+  return { id:result.resultId, enterpriseId:result.enterpriseId, periodType:'monthRange', startMonth:'2026-01', endMonth:result.period, energy:result.totalStandardCoal, electricity:electricity?.physicalAmount, emissions:carbon?.totalEmission, cleanRate:result.cleanEnergyRatio, dataStatus:result.dataStatus }
 })
 export const getEnergyCarbonRecord = enterpriseId => energyCarbonData.find(item => item.enterpriseId === enterpriseId)
 export const getEnergyCarbonRecords = taskRecords => energyCarbonData.map(item => {
@@ -36,6 +37,7 @@ export const acceptanceMaterials = [
 export const greenServices = [
   { serviceId:'svc-org-001', enterpriseId:'ent-001', serviceType:'组织碳核查', year:'2026', stage:'成果已形成', status:'已完成', result:'2026组织碳核查声明', source:'外部专业服务' }, { serviceId:'svc-org-002', enterpriseId:'ent-002', serviceType:'组织碳核查', year:'2026', stage:'第三方核查', status:'进行中', result:'—', source:'既有专业系统' }, { serviceId:'svc-pcf-001', enterpriseId:'ent-001', serviceType:'产品碳足迹', product:'高效光伏组件A', year:'2026', stage:'成果已形成', status:'已完成', result:'产品碳足迹报告', source:'既有专业系统' },
 ]
+export const greenServiceResults = greenServices.map(item => ({ resultId:`green-service-result-${item.serviceId}`, enterpriseId:item.enterpriseId, serviceType:item.serviceType, periodType:'YEAR', period:item.year, resultType:item.serviceType==='产品碳足迹'?'product_footprint':'organization_carbon', resultName:item.result, completionDate:item.status==='已完成'?`${item.year}-08-20`:null, sourceSystem:item.source, sourceRecordId:item.serviceId, attachmentId:item.status==='已完成'?`attachment-${item.serviceId}`:null, status:item.status==='已完成'?'official':'pending', updatedAt:`${item.year}-08-20 10:00` }))
 export const services = { org: greenServices.filter(x=>x.serviceType==='组织碳核查').map(x=>({...x, enterprise:enterprises.find(e=>e.id===x.enterpriseId)?.name})), pcf: greenServices.filter(x=>x.serviceType==='产品碳足迹').map(x=>({...x, enterprise:enterprises.find(e=>e.id===x.enterpriseId)?.name})) }
 export const carbonAssets = [
   { assetId:'asset-quota-001', enterpriseId:'ent-001', assetType:'quota', unit:'万tCO₂e', year:'2026', businessDate:'2026-01-01', applicable:true, amount:68.0, used:64.5, status:'已履约', voucher:'配额凭证 Q-001' }, { assetId:'asset-quota-002', enterpriseId:'ent-002', assetType:'quota', unit:'万tCO₂e', year:'2026', businessDate:'2026-01-01', applicable:true, amount:52.0, used:49.7, status:'进行中', voucher:'配额凭证 Q-002' }, { assetId:'asset-quota-004', enterpriseId:'ent-004', assetType:'quota', unit:'万tCO₂e', year:'2026', businessDate:'2026-01-01', applicable:false, amount:30.5, used:28.9, status:'进行中', voucher:'配额凭证 Q-004' }, { assetId:'asset-green-001', enterpriseId:'ent-001', assetType:'greenPower', unit:'万MWh', period:'2026年1-8月', businessDate:'2026-08-31', applicable:true, amount:2.8, source:'既有专业系统', status:'已获取', voucher:'绿电凭证 G-001' }, { assetId:'asset-green-002', enterpriseId:'ent-002', assetType:'greenPower', unit:'万MWh', period:'2026年1-8月', businessDate:'2026-08-31', applicable:true, amount:1.9, source:'企业补充', status:'待完善', voucher:'绿电凭证 G-002' }, { assetId:'asset-green-003', enterpriseId:'ent-003', assetType:'greenPower', unit:'万MWh', period:'2026年1-8月', businessDate:'2026-08-31', applicable:true, amount:2.1, source:'既有专业系统', status:'已获取', voucher:'绿电凭证 G-003' }, { assetId:'asset-cert-001', enterpriseId:'ent-001', assetType:'greenCertificate', unit:'万MWh', year:'2026', businessDate:'2026-08-18', applicable:true, certificate:'GC-2026-00018', amount:1.2, status:'已核销', expiry:'2026-12-31', voucher:'绿证 GC-2026-00018' }, { assetId:'asset-cert-002', enterpriseId:'ent-002', assetType:'greenCertificate', unit:'万MWh', year:'2026', businessDate:'2026-08-20', applicable:true, certificate:'GC-2026-00023', amount:0.8, status:'待使用', expiry:'2027-03-31', voucher:'绿证 GC-2026-00023' },
@@ -51,20 +53,20 @@ export const reportingItemTemplates = [
   { templateId:'tpl-product', name:'主要产品', category:'企业基础信息', dataDomain:'archive', unit:'', source:'系统已有', inputType:'text', businessLinks:['企业档案','产品单位能耗'], purpose:'用于核对生产边界并支撑产品单位能耗分析。' },
   { templateId:'tpl-enterprise-attribute', name:'企业属性', category:'企业基础信息', dataDomain:'archive', unit:'', source:'系统已有', inputType:'text', businessLinks:['企业档案'], purpose:'用于识别重点用能企业及适用的填报要求。' },
 
-  { templateId:'tpl-electricity', name:'外购电量', category:'能源与碳排数据', dataDomain:'energy', unit:'万kWh', source:'系统已有', businessLinks:['综合能源消费量','单位能耗碳排放'], purpose:'用于计算综合能源消费量及单位能耗碳排放。' },
-  { templateId:'tpl-green-power', name:'绿色电力消费量', category:'能源与碳排数据', dataDomain:'energy', unit:'万kWh', source:'企业填写', voucherRequired:true, businessLinks:['清洁能源消费占比','单位能耗碳排放'], purpose:'用于核算清洁能源消费占比，并支撑单位能耗碳排放计算。' },
-  { templateId:'tpl-gas', name:'天然气消费量', category:'能源与碳排数据', dataDomain:'energy', unit:'万Nm³', source:'系统已有', businessLinks:['综合能源消费量','范围一排放'], purpose:'用于计算综合能源消费量和燃料燃烧产生的范围一排放。' },
-  { templateId:'tpl-heat', name:'热力消费量', category:'能源与碳排数据', dataDomain:'energy', unit:'万GJ', source:'企业填写', voucherRequired:true, businessLinks:['综合能源消费量','单位能耗碳排放'], purpose:'用于计算综合能源消费量及单位能耗碳排放。' },
-  { templateId:'tpl-total-energy', name:'综合能源消费量', category:'能源与碳排数据', dataDomain:'energy', unit:'吨标准煤', source:'系统已有', businessLinks:['单位能耗碳排放','清洁能源消费占比'], purpose:'汇总各类能源消费，为能耗与碳排放指标计算提供基础。' },
-  { templateId:'tpl-output', name:'年产量', category:'能源与碳排数据', dataDomain:'operation', unit:'吨', source:'企业填写', businessLinks:['产品单位能耗','单位能耗碳排放'], purpose:'用于计算产品单位能耗，并校验企业生产规模。' },
-  { templateId:'tpl-industrial-value', name:'工业增加值', category:'能源与碳排数据', dataDomain:'operation', unit:'万元', source:'企业填写', businessLinks:['单位增加值能耗','单位能耗碳排放'], purpose:'用于计算单位增加值能耗及评估节能降碳成效。' },
-  { templateId:'tpl-scope1', name:'范围一排放', category:'能源与碳排数据', dataDomain:'carbon', unit:'tCO₂e', source:'企业填写', businessLinks:['企业碳排放总量','单位能耗碳排放'], purpose:'用于核算企业直接排放和碳排放总量。' },
-  { templateId:'tpl-scope2', name:'范围二排放', category:'能源与碳排数据', dataDomain:'carbon', unit:'tCO₂e', source:'企业填写', businessLinks:['企业碳排放总量','单位能耗碳排放'], purpose:'用于核算外购能源相关的间接排放。' },
+  { templateId:'tpl-electricity', name:'外购电量', category:'能源与碳排', dataDomain:'energy', unit:'万kWh', source:'IoT接入，可人工补录', businessLinks:['综合能源消费量','单位能耗碳排放'], purpose:'以 IoT 数据为主；采集缺失或结算复核时允许人工补录。' },
+  { templateId:'tpl-green-power', name:'绿色电力消费量', category:'能源与碳排', dataDomain:'energy', unit:'万kWh', source:'企业填写', voucherRequired:true, businessLinks:['清洁能源消费占比','单位能耗碳排放'], purpose:'用于核算清洁能源消费占比，并支撑单位能耗碳排放计算。' },
+  { templateId:'tpl-gas', name:'天然气消费量', category:'能源与碳排', dataDomain:'energy', unit:'万Nm³', source:'IoT接入，可人工补录', businessLinks:['综合能源消费量','范围一排放'], purpose:'以 IoT 数据为主；采集缺失或结算复核时允许人工补录。' },
+  { templateId:'tpl-heat', name:'热力消费量', category:'能源与碳排', dataDomain:'energy', unit:'万GJ', source:'企业填写', voucherRequired:true, businessLinks:['综合能源消费量','单位能耗碳排放'], purpose:'用于计算综合能源消费量及单位能耗碳排放。' },
+  { templateId:'tpl-total-energy', name:'综合能源消费量', category:'能源与碳排', dataDomain:'energy', unit:'吨标准煤', source:'系统已有', businessLinks:['单位能耗碳排放','清洁能源消费占比'], purpose:'汇总各类能源消费，为能耗与碳排放指标计算提供基础。' },
+  { templateId:'tpl-output', name:'年产量', category:'能源与碳排', dataDomain:'operation', unit:'吨', source:'企业填写', businessLinks:['产品单位能耗','单位能耗碳排放'], purpose:'用于计算产品单位能耗，并校验企业生产规模。' },
+  { templateId:'tpl-industrial-value', name:'工业增加值', category:'能源与碳排', dataDomain:'operation', unit:'万元', source:'企业填写', businessLinks:['单位增加值能耗','单位能耗碳排放'], purpose:'用于计算单位增加值能耗及评估节能降碳成效。' },
+  { templateId:'tpl-scope1', name:'范围一排放', category:'能源与碳排', dataDomain:'carbon', unit:'tCO₂e', source:'企业填写', businessLinks:['企业碳排放总量','单位能耗碳排放'], purpose:'用于核算企业直接排放和碳排放总量。' },
+  { templateId:'tpl-scope2', name:'范围二排放', category:'能源与碳排', dataDomain:'carbon', unit:'tCO₂e', source:'企业填写', businessLinks:['企业碳排放总量','单位能耗碳排放'], purpose:'用于核算外购能源相关的间接排放。' },
 
-  { templateId:'tpl-solid-waste', name:'工业固废利用量', category:'资源循环与绿色制造', dataDomain:'special', unit:'万吨', source:'企业填写', voucherRequired:true, businessLinks:['工业固废综合利用率'], purpose:'用于计算工业固废综合利用率，支撑资源循环评价。' },
-  { templateId:'tpl-water-reuse', name:'工业用水循环利用率', category:'资源循环与绿色制造', dataDomain:'special', unit:'%', source:'企业填写', voucherRequired:true, businessLinks:['工业用水重复利用率'], purpose:'用于评价工业节水和水资源循环利用水平。' },
-  { templateId:'tpl-waste-heat', name:'余热余压利用量', category:'资源循环与绿色制造', dataDomain:'special', unit:'万GJ', source:'企业填写', voucherRequired:true, businessLinks:['余热余压利用率','综合能源消费量'], purpose:'用于评价余热余压回收利用成效，并核算节能量。' },
-  { templateId:'tpl-green-factory', name:'绿色工厂认证情况', category:'资源循环与绿色制造', dataDomain:'special', unit:'项', source:'企业填写', voucherRequired:true, businessLinks:['绿色制造成果'], purpose:'用于归集绿色制造认证成果，支撑园区绿色制造评价。' },
+  { templateId:'tpl-solid-waste', name:'工业固废利用量', category:'零碳专项建设', dataDomain:'special', unit:'万吨', source:'企业填写', voucherRequired:true, businessLinks:['工业固废综合利用率'], purpose:'用于计算工业固废综合利用率，支撑资源循环评价。' },
+  { templateId:'tpl-water-reuse', name:'工业用水循环利用率', category:'零碳专项建设', dataDomain:'special', unit:'%', source:'企业填写', voucherRequired:true, businessLinks:['工业用水重复利用率'], purpose:'用于评价工业节水和水资源循环利用水平。' },
+  { templateId:'tpl-waste-heat', name:'余热余压利用量', category:'零碳专项建设', dataDomain:'special', unit:'万GJ', source:'企业填写', voucherRequired:true, businessLinks:['余热余压利用率','综合能源消费量'], purpose:'用于评价余热余压回收利用成效，并核算节能量。' },
+  { templateId:'tpl-green-factory', name:'绿色工厂认证情况', category:'零碳专项建设', dataDomain:'special', unit:'项', source:'企业填写', voucherRequired:true, businessLinks:['绿色制造成果'], purpose:'用于归集绿色制造认证成果，支撑园区绿色制造评价。' },
 
   { templateId:'tpl-roof-pv', name:'屋顶光伏覆盖率', category:'零碳专项建设', dataDomain:'special', unit:'%', source:'企业填写', voucherRequired:true, businessLinks:['可利用建筑屋顶光伏覆盖率'], purpose:'用于评价企业可利用屋顶的光伏建设水平。' },
   { templateId:'tpl-green-building', name:'星级绿建比例', category:'零碳专项建设', dataDomain:'special', unit:'%', source:'企业填写', voucherRequired:true, businessLinks:['星级绿色建筑比例'], purpose:'用于评价企业绿色低碳建筑建设成效。' },

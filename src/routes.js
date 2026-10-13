@@ -5,8 +5,8 @@ const both = ['committee', 'enterprise']
 
 // 单一系统的三种视角：菜单只表达当前角色可进入的业务边界。
 export const pageRoutes = [
-  { path:'/zero-carbon-indicators', title:'零碳指标总览', menuLabel:'零碳建设总览', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:1 },
-  { path:'/construction-tasks', title:'零碳建设任务管理', menuLabel:'建设任务管理', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:2 },
+  { path:'/zero-carbon-indicators', title:'零碳建设总览', menuLabel:'零碳建设总览', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:1 },
+  { path:'/construction-tasks', title:'零碳建设任务管理', menuLabel:'建设任务管理', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:false, order:2 },
   { path:'/energy-carbon-monitoring', title:'能碳分析', menuLabel:'能碳运行管理', groups:{committee:'能碳运行管理',enterprise:'企业绿色管理'}, roleLabels:{enterprise:'企业能碳监测'}, roles:both, menuVisible:true, menuVisibleRoles:committee, menuGroupOnly:true, pageType:'module', order:1 },
   { path:'/energy-carbon-monitoring/overview', title:'能碳分析', menuLabel:'能碳监测分析', group:'能碳运行管理', roles:committee, pageType:'subpage', parentPath:'/energy-carbon-monitoring', menuParent:'/energy-carbon-monitoring', menuVisible:true, order:1 },
   { path:'/energy-carbon-monitoring/benchmark', title:'能效对标', menuLabel:'能效对标分析', group:'能碳运行管理', roles:committee, pageType:'subpage', parentPath:'/energy-carbon-monitoring', menuParent:'/energy-carbon-monitoring', menuVisible:true, order:3 },

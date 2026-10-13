@@ -33,12 +33,16 @@ export function EnergyCarbonMonitoringPage({ initialTab = 'energy', embedded = f
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(null)
   const navigate = useNavigate()
-  const { tasks, currentEnterpriseId } = useSharedData()
-  const rows = useMemo(() => dashboardEnterpriseEnergyRows.map(result => {
+  const { tasks, currentEnterpriseId, runtimeResults, runtimeEnergyCarbonData } = useSharedData()
+  const rows = useMemo(() => runtimeResults.enterpriseEnergyResults.map(result => {
     const enterprise = enterprises.find(item => item.id === result.enterpriseId)
     const pendingTask = [...tasks].reverse().find(item => item.enterpriseId === result.enterpriseId && item.status !== '已关闭')
-    return { ...result, id:result.enterpriseId, name:enterprise?.name || result.name, industry:enterprise?.industry || result.industry, electricity:result.electricityBillionKwh, heat:result.heatWanGJ, gas:result.gasMillionNm3, state:result.dataStatus === 'official' && !pendingTask?.pendingData && !pendingTask?.pendingVoucher ? '正常' : '待确认' }
-  }).filter(row => !enterpriseMode || row.id === currentEnterpriseId), [enterpriseMode, tasks, currentEnterpriseId])
+    const carbon = runtimeResults.enterpriseCarbonResults.find(item => item.enterpriseId === result.enterpriseId) || {}
+    const electricity = result.energyConsumption.find(item => item.energyType === 'electricity')
+    const heat = result.energyConsumption.find(item => item.energyType === 'heat')
+    const gas = result.energyConsumption.find(item => item.energyType === 'natural_gas')
+    return { ...result, ...runtimeEnergyCarbonData.find(item => item.enterpriseId === result.enterpriseId), id:result.enterpriseId, name:enterprise?.name, industry:enterprise?.industry, electricity:electricity ? Number(electricity.physicalAmount || 0) / 10000 : null, heat:heat?.physicalAmount ?? null, gas:gas ? Number(gas.physicalAmount || 0) / 100 : null, scope1:carbon.scope1, scope2:carbon.scope2, emissions:carbon.totalEmission, mainEmissionSources:carbon.mainEmissionSources || [], accountingStatus:carbon.accountingStatus, state:result.dataStatus === 'official' && !pendingTask?.pendingData && !pendingTask?.pendingVoucher ? '正常' : '待确认', energyBreakdown:{ electricity:electricity?.standardCoalAmount || 0, heat:heat?.standardCoalAmount || 0, gas:gas?.standardCoalAmount || 0 } }
+  }).filter(row => !enterpriseMode || row.id === currentEnterpriseId), [enterpriseMode, tasks, currentEnterpriseId, runtimeResults, runtimeEnergyCarbonData])
   const filtered = rows.filter(row => row.name.includes(search))
   const parkEnergy = enterpriseMode ? rows.reduce((sum, row) => sum + Number(row.energy || 0), 0) : dashboardAnnualBaseline.energy.total
   const parkCarbon = enterpriseMode ? rows.reduce((sum, row) => sum + Number(row.emissions || 0), 0) : dashboardAnnualBaseline.carbon.total

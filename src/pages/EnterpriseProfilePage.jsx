@@ -20,7 +20,7 @@ export function EnterpriseProfilePage(){
   const [searchParams] = useSearchParams()
   const [enterpriseId,setEnterpriseId] = useState(searchParams.get('enterpriseId') || 'ent-002')
   const navigate = useNavigate()
-  const { tasks, role } = useSharedData()
+  const { tasks, role, services: sharedServices } = useSharedData()
   const enterprise = enterprises.find(item => item.id === enterpriseId)
   const energy = getEnergyCarbonRecord(enterpriseId)
   const meta = profileMeta[enterpriseId] || defaultMeta
@@ -32,7 +32,7 @@ export function EnterpriseProfilePage(){
   const assets = carbonAssets.filter(item => item.enterpriseId === enterpriseId)
   const greenAssets = assets.filter(item => ['greenPower','greenCertificate'].includes(item.assetType))
   const achievementItems = archives.filter(item => (achievementMap[enterpriseId] || []).includes(item.id))
-  const services = greenServices.filter(item => item.enterpriseId === enterpriseId)
+  const services = sharedServices.filter(item => item.enterpriseId === enterpriseId)
   const task = tasks.find(item => item.enterpriseId === enterpriseId)
   const pendingCount = (task?.pendingData || 0) + (task?.pendingVoucher || 0)
   const cleanRate = asNumber(resultFor('ind-clean-energy')?.value || energy?.cleanRate)

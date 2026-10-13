@@ -55,11 +55,22 @@ function LegacyCommitteeIndicatorsPage() {
 
 function CommitteeIndicatorsPage() {
   const navigate = useNavigate()
+  const { runtimeResults, acceptancePackage, constructionTasks } = useSharedData()
   const [achievement, setAchievement] = useState('全部'), [dataStatus, setDataStatus] = useState('全部')
   const [detail, setDetail] = useState(null), [config, setConfig] = useState(null), [basis, setBasis] = useState(false), [alert, setAlert] = useState(null), [notice, setNotice] = useState('')
-  const benchmarkRows = enterpriseEfficiencyBenchmarkResults.filter(item => item.dataStatus === 'official')
+  const benchmarkRows = runtimeResults.enterpriseEfficiencyBenchmarkResults.filter(item => item.dataStatus === 'official')
   const benchmarkRate = benchmarkRows.length ? benchmarkRows.filter(item => item.result !== 'not_compliant').length / benchmarkRows.length * 100 : 0
-  const indicators = indicatorDefinitions.map(item => item.indicatorId === 'ind-product-energy' ? { ...item, value:`${benchmarkRate.toFixed(1)}%`, status:benchmarkRate >= 100 ? '已达标' : '待提升', gap:benchmarkRate >= 100 ? '已达到二级限额' : '存在未达标企业', data:benchmarkRows.length ? '正常' : '待补充', period:'2026年1—7月' } : item)
+  const totalEnergy = runtimeResults.enterpriseEnergyResults.reduce((sum,item)=>sum+Number(item.totalStandardCoal||0),0)
+  const totalCarbon = runtimeResults.enterpriseCarbonResults.reduce((sum,item)=>sum+Number(item.totalEmission||0),0)
+  const cleanRate = totalEnergy ? runtimeResults.enterpriseEnergyResults.reduce((sum,item)=>sum+Number(item.cleanEnergyAmount||0),0) / totalEnergy * 100 : 0
+  const roofComplete = acceptancePackage.status === '已确认' && constructionTasks.some(task => task.indicatorIds?.includes('ind-roof') && task.status === '已完成')
+  const indicators = indicatorDefinitions.map(item => {
+    if (item.indicatorId === 'ind-product-energy') return { ...item, value:`${benchmarkRate.toFixed(1)}%`, status:benchmarkRate >= 100 ? '已达标' : '待提升', gap:benchmarkRate >= 100 ? '已达到二级限额' : '存在未达标企业', data:benchmarkRows.length ? '正常' : '待补充', period:'2026年1—7月' }
+    if (item.indicatorId === 'ind-unit-energy') { const value = totalEnergy ? totalCarbon / totalEnergy : null; return { ...item, value:value == null ? '—' : value.toFixed(3), status:value != null && value <= .3 ? '已达标' : '待提升', gap:value == null ? '待补数据' : value <= .3 ? '达到目标' : '高于目标', data:value == null ? '待补充' : '正常', period:'2026年1—7月' } }
+    if (item.indicatorId === 'ind-clean-energy') return { ...item, value:`${cleanRate.toFixed(1)}%`, status:cleanRate >= 90 ? '已达标' : '待提升', gap:`${Math.max(0,90-cleanRate).toFixed(1)}%`, data:'正常', period:'2026年1—7月' }
+    if (item.indicatorId === 'ind-roof' && roofComplete) return { ...item, value:'已验收', status:'已达标', gap:'建设成果已确认', data:'正常', period:'2026年度' }
+    return item
+  })
   const shown = indicators.filter(item => (achievement === '全部' || item.status === achievement) && (dataStatus === '全部' || item.data === dataStatus))
   const statusSummary = {
     achieved: indicators.filter(item => !parkDataPending(item) && item.status === '已达标').length,

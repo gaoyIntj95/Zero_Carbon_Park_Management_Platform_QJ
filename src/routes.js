@@ -6,6 +6,7 @@ const both = ['committee', 'enterprise']
 // 单一系统的三种视角：菜单只表达当前角色可进入的业务边界。
 export const pageRoutes = [
   { path:'/zero-carbon-indicators', title:'零碳指标总览', menuLabel:'零碳建设总览', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:1 },
+  { path:'/construction-tasks', title:'零碳建设任务管理', menuLabel:'建设任务管理', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:2 },
   { path:'/energy-carbon-monitoring', title:'能碳分析', menuLabel:'能碳运行管理', groups:{committee:'能碳运行管理',enterprise:'企业绿色管理'}, roleLabels:{enterprise:'企业能碳监测'}, roles:both, menuVisible:true, menuVisibleRoles:committee, menuGroupOnly:true, pageType:'module', order:1 },
   { path:'/energy-carbon-monitoring/overview', title:'能碳分析', menuLabel:'能碳监测分析', group:'能碳运行管理', roles:committee, pageType:'subpage', parentPath:'/energy-carbon-monitoring', menuParent:'/energy-carbon-monitoring', menuVisible:true, order:1 },
   { path:'/energy-carbon-monitoring/benchmark', title:'能效对标', menuLabel:'能效对标分析', group:'能碳运行管理', roles:committee, pageType:'subpage', parentPath:'/energy-carbon-monitoring', menuParent:'/energy-carbon-monitoring', menuVisible:true, order:3 },
@@ -15,10 +16,10 @@ export const pageRoutes = [
   { path:'/reporting-task-monitoring', title:'零碳数据填报管理', menuLabel:'企业数据填报', group:'企业协同管理', roles:committee, pageType:'module', menuVisible:false, order:2 },
   { path:'/zero-carbon-results', title:'零碳验收支撑', menuLabel:'零碳验收支撑', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:3 },
 
-  { path:'/enterprise-green-services', title:'企业绿色服务', menuLabel:'企业服务管理', group:'企业协同管理', roles:[], pageType:'module', menuVisible:false, order:3 },
-  { path:'/enterprise-green-services/overview', title:'企业绿色服务', menuLabel:'服务总览', group:'企业协同管理', roles:[], pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:false, order:1 },
-  { path:'/enterprise-green-services/management', title:'企业绿色服务', menuLabel:'服务管理', group:'企业协同管理', roles:[], pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:false, order:2 },
-  { path:'/enterprise-green-services/results', title:'企业绿色服务', menuLabel:'服务成果', group:'企业协同管理', roles:[], pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:false, order:3 },
+  { path:'/enterprise-green-services', title:'企业绿色服务', menuLabel:'企业服务管理', group:'企业协同管理', roles:both, pageType:'module', menuVisible:true, order:3 },
+  { path:'/enterprise-green-services/overview', title:'企业绿色服务', menuLabel:'服务总览', group:'企业协同管理', roles:both, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:false, order:1 },
+  { path:'/enterprise-green-services/management', title:'企业绿色服务', menuLabel:'服务管理', group:'企业协同管理', roles:both, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:false, order:2 },
+  { path:'/enterprise-green-services/results', title:'企业绿色服务', menuLabel:'服务成果', group:'企业协同管理', roles:both, pageType:'subpage', parentPath:'/enterprise-green-services', menuParent:'/enterprise-green-services', menuVisible:false, order:3 },
   { path:'/enterprise-profile', title:'企业绿色画像', menuLabel:'绿色画像', group:'企业绿色管理', roles:enterprise, pageType:'module', menuVisible:true, order:1 },
   { path:'/zero-carbon-path-simulation', title:'零碳路径推演', menuLabel:'零碳路径推演', group:'零碳建设管理', roles:committee, pageType:'module', menuVisible:true, order:2 },
   { path:'/green-service-center', title:'绿色服务中心', menuLabel:'绿色服务', group:'企业绿色管理', roles:enterprise, pageType:'professional', menuVisible:true, order:2 },
@@ -69,7 +70,7 @@ export const pageRoutes = [
 ]
 
 export function getMenuGroups(role) {
-  const order = role === 'enterprise' ? ['企业绿色管理','企业数据协同'] : role === 'admin' ? ['系统管理','数据管理'] : ['零碳建设管理','能碳运行管理','园区运营支撑']
+  const order = role === 'enterprise' ? ['企业绿色管理','企业数据协同'] : role === 'admin' ? ['系统管理','数据管理'] : ['零碳建设管理','能碳运行管理','园区运营支撑','企业协同管理']
   const visible = pageRoutes.filter(route => route.menuVisible && route.roles.includes(role) && (!route.menuVisibleRoles || route.menuVisibleRoles.includes(role)))
   const tabbedServiceParents = new Set(['/organization-carbon', '/product-carbon-footprint', '/supply-chain-carbon'])
   const buildMenuTree = (parentPath, groupRoutes) => groupRoutes

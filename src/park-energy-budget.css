@@ -1,0 +1,193 @@
+.park-budget-page {
+  min-height: 100%;
+  padding: 20px 22px;
+  color: #10284c;
+  background: radial-gradient(circle at 72% 0%, rgba(33, 160, 190, .09), transparent 31%), linear-gradient(180deg, #f5f8fb, #edf4f8);
+}
+
+.park-budget-page * { box-sizing: border-box; }
+
+.park-budget-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.park-budget-title-row { display: flex; align-items: center; gap: 12px; }
+.park-budget-head h1 { margin: 0; color: #0b2853; font-size: 28px; line-height: 1.2; }
+.park-budget-title-row span { padding: 4px 10px; border-radius: 4px; color: #1674da; background: #e5f2ff; font-size: 12px; }
+.park-budget-head p { margin: 6px 0 0; color: #7487a0; font-size: 13px; }
+
+.park-budget-setting,
+.park-budget-filter-actions button,
+.park-budget-mode button,
+.park-budget-tabs button,
+.budget-dialog button { border: 0; cursor: pointer; font: inherit; }
+
+.park-budget-setting {
+  height: 39px;
+  padding: 0 19px;
+  border-radius: 6px;
+  color: #fff;
+  background: linear-gradient(135deg, #1682ee, #0869df);
+  box-shadow: 0 6px 15px rgba(17, 115, 226, .22);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.park-budget-filters,
+.park-budget-card,
+.park-budget-metrics article {
+  border: 1px solid #e0e9f1;
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 7px 22px rgba(33, 72, 110, .055);
+}
+
+.park-budget-filters {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 180px 190px 190px 200px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+}
+
+.park-budget-filters label { display: flex; align-items: center; gap: 8px; color: #344d6b; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.park-budget-filters select { min-width: 0; flex: 1; height: 36px; padding: 0 30px 0 10px; border: 1px solid #d7e2ed; border-radius: 6px; outline: none; color: #213c60; background: #fff; }
+.park-budget-filters select:focus { border-color: #2489e9; box-shadow: 0 0 0 3px rgba(36, 137, 233, .1); }
+
+.park-budget-mode { display: grid; grid-template-columns: 1fr 1fr; height: 38px; padding: 3px; border: 1px solid #d6e1ec; border-radius: 7px; background: #f4f7fa; }
+.park-budget-mode button { border-radius: 5px; color: #576c88; background: transparent; font-size: 12px; }
+.park-budget-mode button.active { color: #fff; background: linear-gradient(135deg, #187fe9, #086cdf); box-shadow: 0 3px 9px rgba(17, 111, 221, .2); }
+.park-budget-filter-actions { display: flex; justify-content: flex-end; gap: 9px; }
+.park-budget-filter-actions button { min-width: 82px; height: 37px; border: 1px solid #d6e1ec; border-radius: 6px; color: #395876; background: #fff; }
+.park-budget-filter-actions button.primary { border-color: transparent; color: #fff; background: linear-gradient(135deg, #147fe9, #076ddd); box-shadow: 0 4px 11px rgba(10, 109, 221, .2); }
+
+.park-budget-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+.park-budget-metrics article { min-height: 116px; display: flex; align-items: center; gap: 14px; overflow: hidden; padding: 16px 18px; border-radius: 10px; }
+.park-budget-metric-icon { width: 46px; height: 46px; flex: 0 0 46px; display: grid; place-items: center; border-radius: 10px; color: #0ba7a8; background: #e0f8f6; font-size: 25px; font-weight: 800; }
+.park-budget-metrics article.budget .park-budget-metric-icon { color: #1675e4; background: #eaf3ff; }
+.park-budget-metrics article.actual .park-budget-metric-icon { color: #098eba; background: #e8f7fc; }
+.park-budget-metrics article.forecast .park-budget-metric-icon { color: #ef6f1b; background: #fff1e7; }
+.park-budget-metrics span { display: block; margin-bottom: 6px; color: #2c4566; font-size: 13px; font-weight: 700; }
+.park-budget-metrics strong { display: block; color: #0c2a54; font-size: 25px; line-height: 1.1; white-space: nowrap; }
+.park-budget-metrics article.actual strong { color: #0aa19e; }
+.park-budget-metrics strong small { color: #314f70; font-size: 12px; font-weight: 700; }
+.park-budget-metrics p { margin: 8px 0 0; color: #798ba3; font-size: 11px; white-space: nowrap; }
+.park-budget-metrics p.over { color: #f05e16; font-weight: 700; }
+.park-budget-metrics p.under { color: #07917e; font-weight: 700; }
+.park-budget-metrics strong.pending { color: #8997a9; font-size: 21px; }
+
+.park-budget-card { border-radius: 10px; }
+.park-budget-trend-card { padding: 15px 17px 10px; }
+.park-budget-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.park-budget-card-head h2 { margin: 0; color: #0b2a54; font-size: 18px; }
+.park-budget-card-head p { margin: 6px 0 0; color: #778aa3; font-size: 11px; }
+.park-budget-legend { display: flex; align-items: center; gap: 14px; color: #506784; font-size: 11px; white-space: nowrap; }
+.park-budget-legend span { display: flex; align-items: center; gap: 5px; }
+.park-budget-legend i { position: relative; display: inline-block; width: 22px; height: 2px; background: currentColor; }
+.park-budget-legend i::after { content: ''; position: absolute; left: 8px; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.park-budget-legend i.blue { color: #187bec; }
+.park-budget-legend i.teal { color: #0eafa6; }
+.park-budget-legend i.orange { color: #f27621; }
+.park-budget-legend i.gray { color: #7889a7; }
+.park-budget-legend i.dashed { background: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 9px); }
+.park-budget-legend i.block { width: 10px; height: 10px; border-radius: 2px; }
+.park-budget-legend i.block::after { display: none; }
+
+.park-budget-trend-chart { position: relative; margin-top: 4px; padding: 0 2px; }
+.park-budget-y-unit { position: absolute; top: 12px; left: 4px; z-index: 1; color: #60748f; font-size: 11px; }
+.budget-trend-svg, .budget-deviation-svg, .budget-monthly-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.budget-grid-line { stroke: #e3eaf1; stroke-width: 1; stroke-dasharray: 2 2; }
+.budget-axis-line { stroke: #aab8c8; stroke-width: 1; }
+.budget-axis-text { fill: #60738e; font-size: 11px; }
+.budget-prediction-zone { fill: #fff3e8; opacity: .78; }
+.budget-zone-label { fill: #ee7020; font-size: 10px; font-weight: 700; }
+.budget-pending-zone { fill: #f1f4f7; opacity: .86; }
+.budget-pending-label { fill: #8290a2; font-size: 10px; font-weight: 700; }
+.budget-target-line { fill: none; stroke: #7485a4; stroke-width: 1.5; stroke-dasharray: 7 4; }
+.budget-target-label { fill: #687a99; font-size: 10px; }
+.budget-budget-line, .budget-actual-line, .budget-forecast-line { fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.budget-budget-line { stroke: #187bee; }
+.budget-actual-line { stroke: #0daea4; }
+.budget-forecast-line { stroke: #f27422; stroke-dasharray: 7 4; }
+.budget-budget-dot { fill: #187bee; stroke: #fff; stroke-width: 1.5; }
+.budget-actual-dot { fill: #0daea4; stroke: #fff; stroke-width: 1.5; }
+.budget-forecast-dot { fill: #f27422; stroke: #fff; stroke-width: 1.5; }
+.budget-key-label { fill: #078d8a; font-size: 12px; font-weight: 800; }
+.budget-key-label.budget-blue { fill: #096bdc; }
+.budget-key-label.budget-orange { fill: #ee5b0d; }
+.park-budget-chart-foot { margin-top: -2px; padding: 8px 2px 2px; color: #8091a5; font-size: 10px; }
+
+.park-budget-bottom-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 12px; margin-top: 12px; }
+.park-budget-deviation-card, .park-budget-month-card { min-width: 0; padding: 15px 16px 9px; }
+.park-budget-deviation-card { position: relative; }
+.park-budget-deviation-total { text-align: right; }
+.park-budget-deviation-total span { display: block; margin-bottom: 3px; color: #72849d; font-size: 10px; }
+.park-budget-deviation-total strong { font-size: 21px; }
+.park-budget-deviation-total strong.positive { color: #ed5d15; }
+.park-budget-deviation-total strong.negative { color: #089987; }
+.park-budget-deviation-total small { color: inherit; font-size: 10px; }
+.park-budget-tabs { position: absolute; top: 66px; left: 170px; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; width: 170px; height: 31px; padding: 2px; border: 1px solid #d6e2ed; border-radius: 5px; background: #f5f8fb; }
+.park-budget-tabs button { border-radius: 4px; color: #657791; background: transparent; font-size: 10px; }
+.park-budget-tabs button.active { color: #fff; background: #187bec; }
+.budget-deviation-svg { margin-top: 34px; }
+.budget-zero-line { stroke: #8fa0b2; stroke-width: 1.2; }
+.budget-bar-label { fill: #2d4868; font-size: 11px; font-weight: 600; }
+.budget-positive-bar { fill: #2786ee; }
+.budget-negative-bar { fill: #11ad9f; }
+.budget-positive-text { fill: #0d70de; font-size: 10px; font-weight: 700; }
+.budget-negative-text { fill: #079a8c; font-size: 10px; font-weight: 700; }
+.budget-month-budget { fill: #2684ed; }
+.budget-month-actual { fill: #10aa9f; }
+.budget-month-forecast { fill: #f37b25; }
+.budget-monthly-svg { margin-top: 10px; }
+
+.park-budget-foot { padding: 11px 3px 0; color: #8393a7; font-size: 10px; text-align: right; }
+
+.budget-dialog-mask { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 20px; background: rgba(12, 31, 57, .42); backdrop-filter: blur(2px); }
+.budget-dialog { width: min(510px, 100%); padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 24px 70px rgba(8, 32, 67, .25); }
+.budget-dialog-head { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 17px; }
+.budget-dialog-head h3 { margin: 0; color: #102f5b; font-size: 20px; }
+.budget-dialog-head p { margin: 5px 0 0; color: #7b8ca2; font-size: 11px; }
+.budget-dialog-head button { width: 30px; height: 30px; border-radius: 50%; color: #718198; background: #f0f4f7; font-size: 20px; }
+.budget-dialog label { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; color: #415b78; font-size: 12px; font-weight: 700; }
+.budget-dialog input, .budget-dialog select { height: 39px; padding: 0 11px; border: 1px solid #d5e1ec; border-radius: 6px; outline: none; color: #213c5d; background: #fff; }
+.budget-dialog input:focus, .budget-dialog select:focus { border-color: #2586e8; box-shadow: 0 0 0 3px rgba(37, 134, 232, .1); }
+.budget-dialog input:disabled { color: #75869b; background: #f3f6f8; }
+.budget-dialog-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.budget-dialog-note { padding: 10px 12px; border-radius: 6px; color: #75613f; background: #fff8e8; font-size: 10px; line-height: 1.6; }
+.budget-dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; }
+.budget-dialog-actions button { min-width: 82px; height: 37px; border: 1px solid #d5e0eb; border-radius: 6px; color: #536a84; background: #fff; }
+.budget-dialog-actions button.primary { border-color: #1478e6; color: #fff; background: #1478e6; }
+
+@media (max-width: 1350px) {
+  .park-budget-filters { grid-template-columns: 160px 170px 170px 190px 1fr; }
+  .park-budget-metrics article { padding-inline: 14px; }
+  .park-budget-metrics strong { font-size: 22px; }
+}
+
+@media (max-width: 1100px) {
+  .park-budget-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .park-budget-filter-actions { justify-content: flex-start; }
+  .park-budget-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .park-budget-bottom-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .park-budget-page { padding: 12px; }
+  .park-budget-head h1 { font-size: 23px; }
+  .park-budget-head { gap: 12px; }
+  .park-budget-setting { padding-inline: 12px; }
+  .park-budget-filters, .park-budget-metrics { grid-template-columns: 1fr; }
+  .park-budget-filters label { justify-content: space-between; }
+  .park-budget-filters select { max-width: 70%; }
+  .park-budget-card-head { align-items: flex-start; flex-direction: column; }
+  .park-budget-trend-chart, .park-budget-month-card, .park-budget-deviation-card { overflow-x: auto; }
+  .budget-trend-svg { min-width: 850px; }
+  .budget-deviation-svg, .budget-monthly-svg { min-width: 620px; }
+  .park-budget-tabs { left: 155px; }
+  .budget-dialog-row { grid-template-columns: 1fr; gap: 0; }
+}

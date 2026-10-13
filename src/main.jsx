@@ -7,7 +7,8 @@ import { ZeroCarbonResultsPage } from './pages/ZeroCarbonResultsPage.jsx'
 import { EnterpriseDataReportingPage } from './pages/EnterpriseDataReportingPage.jsx'
 import { ReportingTaskMonitoringPage } from './pages/ReportingTaskMonitoringPage.jsx'
 import { EnterpriseGreenServicesPage } from './pages/EnterpriseGreenServicesPage.jsx'
-import { ConstructionTaskPage, ScenarioPage, KnowledgeBasePage } from './pages/FocusPages.jsx'
+import { ConstructionTaskPage, ScenarioPage } from './pages/FocusPages.jsx'
+import { KnowledgeBasePage } from './pages/KnowledgeBasePage.jsx'
 import { ReportCenterPage } from './pages/ReportCenterPage.jsx'
 import { SystemPage } from './pages/SystemPages.jsx'
 import { CarbonAssetsPage } from './pages/CarbonAssetsPage.jsx'
@@ -25,7 +26,7 @@ import { ProductCarbonFootprint } from './pages/ProductCarbonFootprintSaas.tsx'
 import { CarbonAccountingV4 } from './pages/OrganizationCarbonManagementSaas.tsx'
 import { enterprises, SharedDataProvider, useSharedData } from './mock/sharedStore.js'
 import { DataManagementProvider } from './mock/DataManagementContext.jsx'
-import './styles.css'; import './data-management.css'; import './extra.css'; import './focus.css'; import './theme.css'; import './menu-alignment.css'; import './zero-carbon-overview.css'; import './zero-carbon-results.css'; import './knowledge-base.css'; import './enterprise-profile.css'; import './enterprise-profile-v3.css'; import './enterprise-profile-v4.css'; import './energy-carbon-overview.css'; import './energy-carbon-capabilities.css'; import './reporting-task.css'; import './scenario.css'
+import './styles.css'; import './data-management.css'; import './extra.css'; import './focus.css'; import './theme.css'; import './menu-alignment.css'; import './zero-carbon-overview.css'; import './zero-carbon-results.css'; import './knowledge-base.css'; import './knowledge-page-v2.css'; import './enterprise-profile.css'; import './enterprise-profile-v3.css'; import './enterprise-profile-v4.css'; import './energy-carbon-overview.css'; import './energy-carbon-capabilities.css'; import './enterprise-efficiency.css'; import './park-energy-flow.css'; import './park-energy-optimization.css'; import './park-energy-budget.css'; import './reporting-task.css'; import './scenario.css'
 
 function menuContainsPath(item, currentLocation){const [pathname]=currentLocation.split('?');return item.path===pathname||Boolean(item.children?.some(child=>menuContainsPath(child,currentLocation)))}
 const tabbedServiceRoots=new Set(['/organization-carbon','/product-carbon-footprint','/supply-chain-carbon'])

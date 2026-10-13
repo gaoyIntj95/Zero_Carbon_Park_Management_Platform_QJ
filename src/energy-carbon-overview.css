@@ -10,3 +10,139 @@
 .combined-analysis-card .small-tip{padding:0 16px 10px}
 @media(max-width:1200px){.combined-analysis-grid{grid-template-columns:1fr}.combined-chart-content{grid-template-columns:minmax(0,1.5fr) minmax(220px,.8fr)}}
 @media(max-width:680px){.combined-chart-content{grid-template-columns:1fr}.combined-analysis-card .html-structure{padding:4px 16px 12px}}
+
+/* Reference-style park energy/carbon monitoring board. */
+.reference-monitor-page{--reference-blue:#1678e8;--reference-teal:#18b4ad;--reference-ink:#10284f;color:#14284c;background:linear-gradient(180deg,#f1f8fc 0%,#eef6fb 100%);margin:-22px -26px -36px;padding:0 0 18px;min-height:calc(100vh - 58px)}
+.reference-page-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px 28px 8px;background:linear-gradient(100deg,#f4fbff,#edf5fc);border-bottom:1px solid #e1edf6}.reference-page-head h1{display:inline;font-size:25px;letter-spacing:.5px;color:#102b55;margin:0 12px 0 0}.reference-page-head span{font-size:14px;color:#6e819d}.reference-head-meta{display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:11px;color:#71839b}.reference-head-meta button{border:0;background:transparent;color:#2178d5;cursor:pointer;padding:5px 7px}.reference-head-meta .demo-btn{border:1px solid #9dc4ef;border-radius:6px;background:#f1f8ff;padding:6px 12px}
+.reference-filters{display:grid;grid-template-columns:1.05fr 1.1fr 1.1fr 1.1fr 108px 108px;align-items:center;gap:16px;margin:0 24px 10px;padding:11px 14px;background:#fff;border:1px solid #e2edf5;border-radius:8px;box-shadow:0 4px 16px rgba(52,107,154,.05)}.reference-filters label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;color:#5a6e8a;font-size:12px}.reference-filters select{min-width:0;width:100%;border-color:#dbe6f0;color:#263e61;padding:7px 28px 7px 10px}.reference-query,.reference-reset{height:32px;border-radius:6px;cursor:pointer;font-size:12px}.reference-query{border:1px solid #0fa7ae;background:linear-gradient(90deg,#12a79f,#13b7b0);color:#fff}.reference-reset{border:1px solid #d5e2ec;background:#f6fafc;color:#60738d}
+.reference-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 24px 10px}.reference-metric{display:flex;align-items:center;min-height:106px;padding:13px 14px;background:#fff;border:1px solid #e0ebf3;border-radius:8px;box-shadow:0 3px 14px rgba(44,99,143,.05);overflow:hidden}.reference-metric-icon{display:grid;place-items:center;flex:none;width:54px;height:54px;margin-right:13px;border-radius:50%;background:#dff8f6;color:#0caaa7;font-size:28px;font-weight:700}.reference-metric-icon.carbon{background:#e0f0ff;color:#1778e7;font-size:17px}.reference-metric-icon.soft{background:#edf4ff;color:#2879d7;font-size:27px}.reference-metric-main{min-width:0}.reference-metric-main>span{display:block;color:#627692;font-size:12px}.reference-metric-main div{display:flex;align-items:baseline;gap:7px;margin:5px 0 4px;white-space:nowrap}.reference-metric-main b{font-size:25px;color:#112b56;letter-spacing:.2px}.reference-metric-main em{font-style:normal;font-size:11px;color:#243e64}.reference-metric-main small{color:#7a8da7;font-size:11px}.reference-metric-main i{font-style:normal;font-weight:700;color:#04a48e;margin-left:5px}.reference-mini-bars{display:flex;align-items:flex-end;gap:3px;height:38px;margin:25px 0 0 auto;padding-left:8px;min-width:70px}.reference-mini-bars i{display:block;width:4px;min-height:8px;border-radius:2px 2px 0 0;background:#79d9cf}.reference-mini-bars.carbon i{background:#8dbcf2}.reference-mini-bars.soft i{background:#b2c1db}
+.reference-main-grid{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(320px,.95fr);gap:12px;margin:0 24px 10px}.reference-panel{background:#fff;border:1px solid #e0ebf3;border-radius:8px;box-shadow:0 3px 14px rgba(44,99,143,.05);overflow:hidden}.reference-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:11px 14px 6px}.reference-panel-head h2,.reference-table-head h2{margin:0;color:#122d59;font-size:16px}.reference-panel-head>div>span,.reference-table-head span{font-size:11px;color:#8292aa}.reference-tabs{display:flex;gap:18px;margin-top:8px;border-bottom:1px solid #e4edf4}.reference-tabs button{border:0;border-bottom:3px solid transparent;background:transparent;padding:0 5px 7px;color:#7a8ca7;font-size:12px;cursor:pointer}.reference-tabs button.active{color:#13a9ac;border-bottom-color:#10adaf;font-weight:700}.reference-switch{display:flex;margin-top:0;border:1px solid #dbe7ee;border-radius:6px;overflow:hidden}.reference-switch button{border:0;border-right:1px solid #dbe7ee;background:#fff;color:#637691;padding:7px 13px;font-size:11px;cursor:pointer}.reference-switch button:last-child{border-right:0}.reference-switch button.active{background:#0daaa9;color:#fff}
+.reference-legend{display:flex;gap:30px;align-items:center;margin:0 32px 0 45px;color:#6a7b94;font-size:11px}.reference-legend span{display:flex;align-items:center;gap:7px}.reference-legend i{display:inline-block}.legend-bar{width:10px;height:10px;background:#43c4bd}.legend-line{width:18px;height:2px;background:#187ce9;position:relative}.legend-line:after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:#187ce9;left:6px;top:-2px}.reference-chart{position:relative;height:246px;padding:4px 26px 28px 42px}.reference-chart svg{display:block;width:100%;height:220px}.reference-grid-lines line{stroke:#e8eff4;stroke-width:1}.reference-energy-bar{fill:#4dc6be;opacity:.95}.reference-carbon-line{fill:none;stroke:#187eea;stroke-width:2.3}.reference-carbon-dot{fill:#197de8;stroke:#fff;stroke-width:1.5}.reference-axis{position:absolute;top:16px;bottom:30px;display:flex;flex-direction:column;justify-content:space-between;color:#71839d;font-size:10px}.reference-axis.left{left:17px}.reference-axis.right{right:8px;text-align:right}.reference-months{position:absolute;left:42px;right:26px;bottom:8px;display:flex;justify-content:space-between;color:#5b6f8b;font-size:10px}.reference-chart-note{padding:0 14px 10px;color:#8b99ae;font-size:10px}.reference-structure-panel{padding-bottom:8px}.reference-structure-panel>.reference-panel-head{padding-bottom:9px;border-bottom:1px solid #e6eff5}.reference-donut-card{margin:0 12px;padding:8px 8px 7px;border-bottom:1px solid #e6eff5}.reference-donut-card:last-child{border-bottom:0}.reference-donut-card h3{margin:0 0 5px;padding-left:7px;border-left:3px solid #14aaa7;font-size:12px;color:#15345e}.reference-donut-content{display:flex;align-items:center;justify-content:space-around;gap:10px}.reference-donut{display:grid;place-items:center;width:116px;height:116px;border-radius:50%;flex:none}.reference-donut>div{display:flex;flex-direction:column;align-items:center;justify-content:center;width:77px;height:77px;border-radius:50%;background:#fff;color:#12305c;text-align:center}.reference-donut b{font-size:11px;font-weight:600}.reference-donut strong{margin-top:2px;font-size:14px}.reference-donut-legend{display:flex;flex-direction:column;gap:8px;min-width:112px}.reference-donut-legend span{display:grid;grid-template-columns:9px 1fr auto;gap:7px;align-items:center;color:#536887;font-size:11px}.reference-donut-legend i{width:9px;height:9px;border-radius:50%;background:#13aaa7}.reference-donut-card:nth-child(3) .reference-donut-legend i{background:#2179e8}.reference-donut-legend b{color:#18345e;font-size:11px}.reference-donut-card>small{display:block;margin-left:calc(50% + 30px);color:#8b99ae;font-size:10px}
+.reference-secondary-grid{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(320px,.95fr);gap:12px;margin:0 24px 10px}.reference-scatter-panel{min-height:223px}.reference-scatter-panel .reference-panel-head{align-items:center}.reference-scatter{position:relative;height:144px;margin:2px 34px 0 48px}.reference-scatter-y{position:absolute;left:-25px;top:-4px;bottom:18px;display:flex;flex-direction:column;justify-content:space-between;color:#71839d;font-size:10px}.reference-scatter-grid{position:absolute;inset:0 0 18px;border-bottom:1px solid #dce7ef;border-left:1px solid #dce7ef}.scatter-grid-line,.scatter-grid-column{position:absolute;pointer-events:none}.scatter-grid-line{left:0;right:0;border-top:1px dashed #e7eef4}.scatter-grid-column{top:0;bottom:0;border-left:1px dashed #edf2f6}.reference-point{position:absolute;transform:translate(-50%,50%);display:flex;align-items:center;gap:5px;color:#234064;font-size:10px;white-space:nowrap}.reference-point i{width:11px;height:11px;border-radius:50%;background:#1a9bbf;box-shadow:0 0 0 2px #d9f2f5}.reference-point span{font-weight:700}.reference-point small{display:block;font-weight:400}.reference-scatter-x{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;color:#71839d;font-size:10px}.reference-scatter-label{display:flex;justify-content:space-between;margin:0 35px 0 48px;color:#5f7290;font-size:10px}.reference-scatter-label span{transform:rotate(-90deg);transform-origin:right center;margin-right:-8px}.reference-attention-panel .reference-panel-head{padding-bottom:0;border-bottom:1px solid #e6eff5}.reference-attention-list{margin:0 12px}.reference-attention-list>div{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:10px;padding:10px 3px;border-bottom:1px solid #edf2f6;font-size:11px}.reference-attention-list>div:last-child{border-bottom:0}.reference-attention-list b{color:#193461}.reference-attention-list span{color:#71839d}.reference-attention-list strong{font-size:13px}.reference-attention-list strong.up{color:#ff670d}.reference-attention-list strong.down{color:#0a9e91}
+.reference-table-panel{margin:0 24px;background:#fff;border:1px solid #e0ebf3;border-radius:8px;box-shadow:0 3px 14px rgba(44,99,143,.05);overflow:hidden}.reference-table-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px 7px}.reference-table-head h2{display:inline;margin-right:12px}.reference-table-actions{display:flex;gap:10px}.reference-table-actions input{width:190px;border:1px solid #dbe7ef;border-radius:6px;padding:7px 10px;color:#415878;font-size:11px}.export-btn{border:0;border-radius:6px;background:#10a9a7;color:#fff;padding:7px 15px;font-size:11px}.reference-enterprise-table{table-layout:fixed}.reference-enterprise-table th{background:#edf3f7;color:#506580;font-size:11px;text-align:center;padding:8px 7px}.reference-enterprise-table td{font-size:11px;color:#405674;text-align:center;padding:7px;border-bottom:1px solid #e8eff4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reference-enterprise-table th:nth-child(1){width:17%}.reference-enterprise-table th:nth-child(2){width:12%}.reference-enterprise-table th:nth-child(3),.reference-enterprise-table th:nth-child(4){width:15%}.reference-enterprise-table th:nth-child(5),.reference-enterprise-table th:nth-child(6){width:11%}.reference-enterprise-table th:nth-child(7){width:12%}.reference-enterprise-table th:nth-child(8){width:10%}.reference-enterprise-table td:first-child{text-align:left;font-weight:650;color:#253f65}.trend-up{color:#ff690e!important}.trend-down{color:#06a28d!important}.reference-status{display:inline-block;padding:3px 11px;border-radius:12px;font-size:10px}.reference-status.confirmed{background:#d9f2e1;color:#1e9b6c}.reference-status.pending{background:#ffedc7;color:#e29720}.reference-detail-btn{border:0;background:transparent;color:#1277de;font-size:11px;cursor:pointer}.reference-table-foot{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;color:#8a98ad;font-size:10px}.reference-table-foot b{display:inline-grid;place-items:center;width:24px;height:22px;background:#08a8a8;color:#fff;border-radius:4px;font-size:11px}.reference-table-foot select{font-size:10px;padding:4px 20px 4px 5px;color:#536b87}
+@media(max-width:1200px){.reference-page-head{align-items:flex-start}.reference-head-meta{flex-wrap:wrap;justify-content:flex-end}.reference-filters{grid-template-columns:repeat(4,1fr)}.reference-query,.reference-reset{grid-column:span 2}.reference-main-grid,.reference-secondary-grid{grid-template-columns:1fr}.reference-structure-panel{display:grid;grid-template-columns:1fr 1fr}.reference-structure-panel>.reference-panel-head{grid-column:1/-1}.reference-donut-card{border-bottom:0;border-right:1px solid #e6eff5}.reference-donut-card:last-child{border-right:0}}
+@media(max-width:760px){.reference-monitor-page{margin:-18px -14px -30px}.reference-page-head{padding:12px 14px;display:block}.reference-page-head h1{display:block;font-size:22px;margin-bottom:5px}.reference-head-meta{justify-content:flex-start;margin-top:8px;white-space:normal}.reference-filters{grid-template-columns:1fr 1fr;margin-inline:14px}.reference-filters label{grid-template-columns:1fr;gap:4px}.reference-metrics{grid-template-columns:1fr 1fr;margin-inline:14px}.reference-metric{padding:10px}.reference-metric-icon{width:40px;height:40px;margin-right:8px;font-size:20px}.reference-metric-main b{font-size:19px}.reference-mini-bars{display:none}.reference-main-grid,.reference-secondary-grid{margin-inline:14px}.reference-table-panel{margin-inline:14px}.reference-structure-panel{display:block}.reference-structure-panel>.reference-panel-head{border-bottom:1px solid #e6eff5}.reference-donut-card{border-right:0;border-bottom:1px solid #e6eff5}.reference-table-head{align-items:flex-start;flex-direction:column}.reference-table-actions{width:100%}.reference-table-actions input{flex:1}.reference-table-foot{gap:8px;align-items:flex-start;flex-direction:column}.reference-chart{padding-left:36px}.reference-axis.left{left:10px}.reference-months{left:36px}.reference-point{font-size:9px}}
+
+/* Keep ticks, axis titles and marks in the same SVG coordinate system. */
+.reference-trend-panel .reference-chart{height:auto;padding:0 14px 2px}
+.reference-trend-panel .reference-chart svg,.reference-scatter-panel .reference-scatter svg{display:block;width:100%;height:auto}
+.reference-trend-panel svg text,.reference-scatter-panel svg text{fill:#536b8b;font-size:14px;font-family:inherit}
+.reference-chart-axis{stroke:#a9bbce;stroke-width:1.25}
+.reference-trend-panel .reference-grid-lines line,.reference-scatter-panel .reference-grid-lines line{stroke:#e5edf5;stroke-width:1;stroke-dasharray:3 3}
+.reference-trend-panel .reference-grid-lines text,.reference-scatter-panel .reference-grid-lines text{fill:#647a98;font-size:14px}
+
+/* Five summary indicators with the energy-carbon intensity highlighted in the center. */
+.reference-metrics{grid-template-columns:repeat(5,minmax(0,1fr))}
+.reference-metric{min-width:0;padding:12px 10px}
+.reference-metric-icon{width:44px;height:44px;margin-right:9px;font-size:23px}
+.reference-metric-main b{font-size:22px}
+.reference-mini-bars{gap:2px;min-width:42px;padding-left:5px}
+.reference-mini-bars i{width:3px}
+.reference-metric.core{position:relative;border-color:#9ddbd8;background:linear-gradient(145deg,#f0fcfb,#fff 78%);box-shadow:0 4px 16px rgba(12,157,156,.11)}
+.reference-metric.core:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#12aaa6,#2388e8)}
+.reference-metric-icon.core{background:#d8f5f2;color:#078d91}
+.reference-metric.core .reference-metric-main>span{color:#087f83;font-weight:700}
+.reference-metric.core .reference-metric-main b{color:#078f91}
+.reference-metric.core .reference-mini-bars{display:none}
+.reference-metric-main .reference-metric-note{color:#71899b;font-size:10px}
+@media(max-width:1200px){.reference-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.reference-metric{padding:12px}}
+@media(max-width:760px){.reference-metrics{grid-template-columns:1fr 1fr;margin-inline:14px}.reference-metric{padding:10px}.reference-metric-icon{width:40px;height:40px;margin-right:8px;font-size:20px}.reference-metric-main b{font-size:19px}.reference-mini-bars{display:none}}
+
+/* Match enterprise detail typography to the surrounding monitoring panels. */
+.reference-enterprise-table th{padding:11px 9px;font-size:12px}
+.reference-enterprise-table td{padding:10px 9px;font-size:13px;line-height:1.5}
+.reference-enterprise-table td:first-child{font-size:13px}
+.reference-enterprise-table .reference-status{padding:4px 12px;font-size:11px}
+.reference-enterprise-table .reference-detail-btn{font-size:12px}
+.reference-table-foot{font-size:11px}
+.reference-scatter-panel .reference-scatter{height:auto;margin:0 16px 0 8px}
+.reference-scatter-dot{fill:#139dc0;stroke:#fff;stroke-width:2.5}
+.reference-scatter-panel .reference-scatter-point-label{fill:#203b65;font-size:13px;font-weight:600}
+.reference-scatter-panel .reference-axis-title{fill:#405b80;font-size:14px;font-weight:600}
+.reference-scatter-panel .reference-chart-note{padding-top:3px}
+.reference-switch button:disabled{color:#a9b7c7;background:#f5f8fa;cursor:not-allowed}
+@media(max-width:1450px){.reference-mini-bars{display:none}}
+
+/* Reduce page height while keeping the enterprise table easy to read. */
+.reference-page-head{padding-block:7px 5px}
+.reference-filters{gap:12px;margin-bottom:8px;padding-block:8px}
+.reference-metrics{gap:10px;margin-bottom:8px}
+.reference-metric{min-height:88px;padding-block:9px}
+.reference-main-grid,.reference-secondary-grid{gap:10px;margin-bottom:8px}
+.reference-panel-head{padding-top:8px;padding-bottom:4px}
+.reference-trend-panel .reference-chart svg{height:190px}
+.reference-chart-note{padding-bottom:7px}
+.reference-structure-panel{padding-bottom:4px}
+.reference-donut-card{padding-block:5px}
+.reference-donut{width:104px;height:104px}
+.reference-donut>div{width:70px;height:70px}
+.reference-donut-legend{gap:6px}
+.reference-scatter-panel{min-height:0}
+.reference-scatter-panel .reference-scatter svg{height:210px}
+.reference-table-head{padding-block:7px 5px}
+.reference-enterprise-table th{padding-block:7px}
+.reference-enterprise-table td{padding-block:7px;font-size:13px}
+.reference-table-foot{padding-block:6px}
+@media(max-width:760px){.reference-trend-panel .reference-chart svg{height:180px}.reference-scatter-panel .reference-scatter svg{height:200px}}
+
+/* Refine the enterprise detail table to match the compact reference layout. */
+.reference-table-head{min-height:42px;padding:7px 12px 6px;border-bottom:1px solid #e7eef5}
+.reference-table-head h2{font-size:18px;vertical-align:middle}
+.reference-table-head span{margin-left:4px}
+.reference-table-actions{align-items:center}
+.reference-table-actions input{height:32px;padding:6px 10px;font-size:12px}
+.export-btn{min-height:32px;padding:6px 14px;font-size:12px;font-weight:600}
+.reference-enterprise-table{width:100%;border-collapse:collapse}
+.reference-enterprise-table th{height:30px;padding:5px 8px;background:linear-gradient(180deg,#f0f5f9,#eaf1f6);font-size:12px;font-weight:650;border-bottom:1px solid #dce7ef}
+.reference-enterprise-table td{height:29px;padding:4px 8px;font-size:13px;line-height:1.25;vertical-align:middle;border-bottom:1px solid #e8eff4}
+.reference-enterprise-table tbody tr:nth-child(even){background:#fbfdff}
+.reference-enterprise-table tbody tr:hover{background:#f1f9fc}
+.reference-enterprise-table th:nth-child(1){width:18%}
+.reference-enterprise-table th:nth-child(2){width:12%}
+.reference-enterprise-table th:nth-child(3){width:14%}
+.reference-enterprise-table th:nth-child(4){width:16%}
+.reference-enterprise-table th:nth-child(5),.reference-enterprise-table th:nth-child(6){width:11%}
+.reference-enterprise-table th:nth-child(7){width:10%}
+.reference-enterprise-table th:nth-child(8){width:8%}
+.reference-enterprise-table .reference-status{min-width:58px;padding:3px 9px;font-size:11px;font-weight:600}
+.reference-enterprise-table .reference-detail-btn{padding:3px 6px;font-size:12px;font-weight:600}
+.reference-table-foot{min-height:32px;padding:5px 12px;font-size:11px}
+.reference-table-foot b{width:24px;height:22px}
+@media(max-width:760px){.reference-table-head h2{font-size:16px}.reference-enterprise-table{min-width:980px}}
+
+/* Share the trend row more evenly; the structure panel uses the recovered width. */
+.reference-main-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.reference-trend-panel .reference-chart svg{height:210px}
+
+/* Bring the overview sections onto one consistent card and spacing rhythm. */
+.reference-monitor-page{background:#f3f7fb}
+.reference-page-head{background:#f3f8fc;border-bottom-color:#dce8f1}
+.reference-filters,.reference-metric,.reference-panel,.reference-table-panel{border-color:#dce7f0;border-radius:10px;box-shadow:0 2px 10px rgba(33,76,116,.045)}
+.reference-filters{margin-bottom:14px}
+.reference-metrics{gap:12px;margin-bottom:14px}
+.reference-metric{min-height:96px;padding-inline:13px}
+.reference-metric.core{box-shadow:0 3px 12px rgba(12,157,156,.09)}
+.reference-main-grid,.reference-secondary-grid{align-items:stretch;gap:14px;margin-bottom:14px}
+.reference-panel-head{padding:12px 16px 7px}
+.reference-panel-head h2,.reference-table-head h2{font-size:17px}
+.reference-main-grid .reference-panel{min-width:0}
+.reference-trend-panel .reference-chart svg{height:204px}
+.reference-structure-panel{display:flex;flex-direction:column}
+.reference-donut-card{flex:1;display:flex;flex-direction:column;justify-content:center;padding:8px 10px}
+.reference-donut-card h3{font-size:13px}
+.reference-donut-content{justify-content:center;gap:clamp(20px,4vw,56px)}
+.reference-donut{width:100px;height:100px}
+.reference-donut>div{width:68px;height:68px}
+.reference-donut strong{font-size:15px}
+.reference-donut-legend{min-width:132px;gap:8px}
+.reference-donut-legend span{font-size:12px}
+.reference-donut-legend b{font-size:12px}
+.reference-donut-card>small{align-self:center;margin:5px 0 0;color:#8998ac}
+.reference-attention-panel{display:flex;flex-direction:column}
+.reference-attention-list{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+.reference-attention-list>div{grid-template-columns:80px 1fr auto;padding-block:11px;font-size:12px}
+.reference-attention-list strong{font-size:14px}
+.reference-table-panel{margin-bottom:0}
+.reference-secondary-grid{grid-template-columns:minmax(0,2fr) minmax(360px,1.1fr)}
+@media(max-width:1200px){.reference-main-grid,.reference-secondary-grid{gap:12px;margin-bottom:12px}}
+@media(max-width:760px){.reference-main-grid,.reference-secondary-grid{gap:12px;margin-bottom:12px}.reference-panel-head{padding:11px 13px 6px}.reference-donut-card{padding-block:12px}.reference-donut-content{gap:20px}.reference-donut-legend{min-width:112px}.reference-attention-list>div{padding-block:10px}}

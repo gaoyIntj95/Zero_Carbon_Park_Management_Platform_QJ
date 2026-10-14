@@ -140,9 +140,28 @@
 .reference-donut-card>small{align-self:center;margin:5px 0 0;color:#8998ac}
 .reference-attention-panel{display:flex;flex-direction:column}
 .reference-attention-list{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
-.reference-attention-list>div{grid-template-columns:80px 1fr auto;padding-block:11px;font-size:12px}
+.reference-attention-list>div{grid-template-columns:minmax(76px,1.2fr) minmax(0,1fr) auto;padding-block:11px;font-size:12px}
+.reference-attention-list b,.reference-attention-list span,.reference-attention-list strong{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .reference-attention-list strong{font-size:14px}
 .reference-table-panel{margin-bottom:0}
-.reference-secondary-grid{grid-template-columns:minmax(0,2fr) minmax(360px,1.1fr)}
+.reference-secondary-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.reference-structure-panel,.reference-attention-panel{height:380px;min-height:380px}
+.reference-donut-legend{min-width:228px}
+.reference-donut-legend span{grid-template-columns:9px minmax(58px,1fr) auto auto;gap:6px}
+.reference-donut-legend label{min-width:0;color:#536887;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reference-donut-legend b,.reference-donut-legend em{white-space:nowrap}
+.reference-attention-panel .reference-panel-head{padding-bottom:10px}
+.reference-attention-body{padding:0 12px 4px;overflow:hidden}
+.reference-attention-section + .reference-attention-section{margin-top:6px;padding-top:6px;border-top:1px solid #e6eff5}
+.reference-attention-section h3{margin:0 3px 2px;color:#149fa5;font-size:12px}
+.reference-attention-section .reference-attention-list{display:block;margin:0}
+.reference-attention-section .reference-attention-list>div{padding-block:8px}
+.reference-attention-list strong.gap{color:#d8901a;font-size:12px}
+.reference-attention-panel .reference-chart-note{margin-top:auto}
+.reference-donut-content{justify-content:center;gap:clamp(20px,4vw,56px)}
+.reference-donut-legend{flex:none;min-width:228px}
+.reference-donut-legend span{grid-template-columns:9px minmax(58px,1fr) auto 50px}
+.reference-donut-legend b,.reference-donut-legend em{text-align:right}
 @media(max-width:1200px){.reference-main-grid,.reference-secondary-grid{gap:12px;margin-bottom:12px}}
-@media(max-width:760px){.reference-main-grid,.reference-secondary-grid{gap:12px;margin-bottom:12px}.reference-panel-head{padding:11px 13px 6px}.reference-donut-card{padding-block:12px}.reference-donut-content{gap:20px}.reference-donut-legend{min-width:112px}.reference-attention-list>div{padding-block:10px}}
+@media(max-width:1200px){.reference-structure-panel,.reference-attention-panel{height:360px;min-height:360px}}
+@media(max-width:760px){.reference-main-grid,.reference-secondary-grid{gap:12px;margin-bottom:12px}.reference-panel-head{padding:11px 13px 6px}.reference-donut-card{padding-block:12px}.reference-donut-content{gap:20px}.reference-donut-legend{min-width:112px}.reference-attention-list>div{padding-block:10px}.reference-structure-panel,.reference-attention-panel{height:auto;min-height:0}.reference-attention-body{overflow:visible}}

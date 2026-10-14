@@ -91,14 +91,15 @@
 
 .eff-table-card { margin-top: 12px; overflow: hidden; }
 .eff-table-wrap { overflow-x: auto; padding: 0 15px; }
-.eff-table-card table { width: 100%; min-width: 960px; border-collapse: collapse; color: #3b5571; font-size: 11px; text-align: center; }
-.eff-table-card th { height: 37px; padding: 7px 10px; color: #365270; background: #edf4f8; font-weight: 700; white-space: nowrap; }
+.eff-table-card table { width: 100%; min-width: 960px; table-layout: fixed; border-collapse: collapse; color: #3b5571; font-size: 11px; text-align: center; }
+.eff-table-card th, .eff-table-card td { width: 14.2857%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eff-table-card th { height: 37px; padding: 7px 10px; color: #365270; background: #edf4f8; font-weight: 700; }
 .eff-table-card td { height: 41px; padding: 7px 10px; border-top: 1px solid #e4ecf2; }
 .eff-table-card tbody tr:nth-child(even) { background: #fbfdfe; }
 .eff-table-card tbody tr:hover { background: #f1f7fd; }
 .eff-table-card td:first-child, .eff-table-card td:nth-child(2) { text-align: left; }
 .eff-table-card td strong { color: #173a60; }
-.eff-table-card td small { display: block; margin-top: 3px; color: #8495a8; font-size: 9px; }
+.eff-table-card td small { display: inline; margin: 0 0 0 6px; color: #8495a8; font-size: 9px; }
 .eff-table-card td.good { color: #079581; font-weight: 700; }
 .eff-table-card td.warn { color: #ef741e; font-weight: 700; }
 .eff-status { display: inline-block; min-width: 84px; padding: 4px 8px; border-radius: 12px; white-space: nowrap; }

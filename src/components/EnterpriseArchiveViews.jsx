@@ -1,0 +1,88 @@
+import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useDataManagement } from '../mock/DataManagementContext.jsx'
+import { useCollaboration, createTask, taskAction } from '../mock/collaborationStore.js'
+import { useEnterpriseArchive, effectiveProfile, applyArchiveAction, archiveAction, archiveSnapshot, changeFields, fieldLabel } from '../mock/enterpriseArchiveStore.js'
+import { useSharedData } from '../mock/sharedStore.js'
+import '../enterprise-archive-views.css'
+
+const val = value => value || '—'
+const isBoundary = change => ['statisticsBoundary', 'managementScope'].includes(change.field)
+function Badge({ value }) { return <span className={`ea-badge ${value === '已纳管' || value === '已确认' || value === '已生效' ? 'ok' : value === '退回补充' ? 'returned' : ''}`}>{value}</span> }
+function MaterialLink({ item }) { const href = item.data || `data:text/plain;charset=utf-8,${encodeURIComponent(item.content || '示例依据材料')}`; return <a className="ea-material" href={href} download={item.name} title={item.name}>▤ {item.name} ↓</a> }
+function Summary({ enterprise }) { return <dl className="ea-summary">{[['企业名称', enterprise.name], ['统一社会信用代码', enterprise.creditCode], ['所属行业', enterprise.industry], ['企业类型', enterprise.enterpriseType], ['主要产品', enterprise.mainProducts], ['生产规模', enterprise.productionScale], ['企业地址', enterprise.address], ['联系人', enterprise.contact], ['联系电话', enterprise.phone], ['纳入状态', enterprise.managedStatus], ['纳入时间', enterprise.includedAt], ['退出时间', enterprise.exitedAt], ['园区管理范围', enterprise.managementScope], ['园区统计边界', enterprise.statisticsBoundary]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd title={value}>{val(value)}</dd></div>)}</dl> }
+function Related({ enterprise, park, navigate }) {
+  const { nodes, energyRecords, records } = useDataManagement()
+  const ownNodes = nodes.filter(n => n.enterpriseId === enterprise.enterpriseId), ownEnergy = energyRecords.filter(r => r.enterpriseId === enterprise.enterpriseId), ownRecords = records.filter(r => r.enterpriseId === enterprise.enterpriseId)
+  const ownMeters = ownNodes.filter(n => /计量|表计/.test(n.nodeType || ''))
+  const links = [
+    ['能源设施', `${ownNodes.filter(n => n.nodeRole === 'FACILITY').length} 项关联设施`, park ? `/energy-facilities?enterpriseId=${enterprise.enterpriseId}` : '/enterprise-energy-carbon'],
+    ['计量点', `${ownMeters.length} 项节点关联`, park ? `/energy-facilities?tab=meter&enterpriseId=${enterprise.enterpriseId}` : '/enterprise-energy-carbon'],
+    ['能碳数据', `${ownEnergy.length + ownRecords.length} 条业务记录`, park ? `/business-data?enterpriseId=${enterprise.enterpriseId}` : '/enterprise-energy-carbon'],
+    ['绿色成果', enterprise.greenFactory ? '已认定绿色工厂' : '暂无绿色工厂认定', park ? `/zero-carbon-data?enterpriseId=${enterprise.enterpriseId}` : '/enterprise-zero-carbon'],
+  ]
+  return <><div className="ea-related-highlight"><strong>园区统计边界</strong><p>{enterprise.statisticsBoundary}</p></div><div className="ea-related-list">{links.map(([label, note, path]) => <div key={label}><b>{label}</b><span title={note}>{note}</span><button className="op-btn" onClick={() => navigate(path)}>查看记录 →</button></div>)}</div></>
+}
+function ChangeList({ enterpriseId, park, onEdit, onAction, onTask }) {
+  const { changes } = useEnterpriseArchive(), requests = changes.filter(c => c.enterpriseId === enterpriseId)
+  return <div className="ea-change-list">{requests.length ? requests.map(c => <section key={c.id} className="ea-change"><div className="ea-change-head"><strong>{fieldLabel(c.field)}</strong><Badge value={c.status}/></div><div className="ea-before-after"><div><small>当前有效内容</small><p>{val(c.currentValue)}</p></div><span aria-hidden="true">→</span><div><small>拟变更内容</small><p>{val(c.proposedValue)}</p></div></div><p><b>变更原因：</b>{c.reason}</p><p><b>拟生效时间：</b>{c.effectiveDate}　<b>提交时间：</b>{val(c.submittedAt)}</p><p><b>依据材料：</b>{c.materials.length ? c.materials.map(m => <MaterialLink item={m} key={m.id}/>) : '—'}</p>{isBoundary(c) && <div className="ea-impact">确认前沿用当前有效范围；变更生效后会影响园区汇总、同环比和指标统计口径。</div>}{c.feedback && <div className="ea-feedback"><b>园区反馈 · {c.feedback.at}</b><p>{c.feedback.opinion}</p></div>}{c.status === '已确认' && <p className="ea-approved">园区已于 {c.confirmedAt} 确认，{c.effectiveDate} 起生效。</p>}{c.taskId && <p><b>关联任务：</b><button className="op-btn" onClick={() => onTask(c.taskId)}>查看任务 →</button></p>}<div className="ea-timeline">{c.history.map((item, i) => <div key={i}><time>{item.at}</time><b>{item.action}</b><span>{item.actor} · {item.note}</span></div>)}</div>{park && c.status === '待园区确认' && <div className="ea-actions"><button className="btn" onClick={() => onAction(c, 'return')}>退回补充</button><button className="btn primary" onClick={() => onAction(c, 'confirm')}>确认变更</button></div>}{!park && ['待提交', '退回补充'].includes(c.status) && <div className="ea-actions"><button className="btn primary" onClick={() => onEdit(c)}>{c.status === '退回补充' ? '修正并再次提交' : '继续申请'}</button></div>}</section>) : <div className="ea-empty">暂无变更记录</div>}</div>
+}
+function DrawerFrame({ title, name, tabs, tab, setTab, close, children, footer }) { return <div className="ct-mask" onMouseDown={e => e.target === e.currentTarget && close()}><aside className="ct-drawer ea-drawer" role="dialog" aria-modal="true" aria-label={title}><header><h2>{title}</h2><button aria-label="关闭抽屉" onClick={close}>×</button></header>{name && <div className="ea-drawer-name" title={name}>{name}</div>}{tabs && <nav className="ct-tabs ea-drawer-tabs">{tabs.map(([key, label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}</button>)}</nav>}<div className="ct-drawer-body ea-drawer-body">{children}</div><footer>{footer || <button className="btn" onClick={close}>关闭</button>}</footer></aside></div> }
+
+export function ArchiveDetailDrawer({ enterpriseId, onClose, initialTab = 'basic', park = true }) {
+  const archive = useEnterpriseArchive(), { tasks } = useCollaboration(), navigate = useNavigate(), enterprise = effectiveProfile(archive, enterpriseId)
+  const [tab, setTab] = useState(initialTab), [management, setManagement] = useState(false), [draft, setDraft] = useState({ managedStatus: enterprise.managedStatus, includedAt: enterprise.includedAt, exitedAt: enterprise.exitedAt, managementScope: enterprise.managementScope }), [acting, setActing] = useState(null), [opinion, setOpinion] = useState(''), [message, setMessage] = useState('')
+  if (!enterprise) return null
+  const changeAction = (change, action) => { try { if (change.taskId && tasks.find(t => t.id === change.taskId)?.status === '待园区确认') taskAction({ action, id: change.taskId, actor: 'park', payload: { opinion } }); else archiveAction({ action, id: change.id, enterpriseId, actor: 'park', payload: { opinion } }); setActing(null); setOpinion(''); setMessage(action === 'return' ? '已退回，企业端同步显示反馈意见。' : '已确认，按拟生效日期更新有效档案。') } catch (error) { setMessage(error.message) } }
+  const viewTask = id => navigate(`/data-overview?tab=reporting&taskId=${encodeURIComponent(id)}`)
+  const saveManagement = () => { try { archiveAction({ action: 'management', enterpriseId, actor: 'park', payload: draft }); setManagement(false); setMessage('园区管理关系已更新并留痕。') } catch (error) { setMessage(error.message) } }
+  return <DrawerFrame title={management ? '维护管理关系' : '企业档案'} name={enterprise.name} tabs={management ? null : [['basic','基本信息'],['related','关联信息'],['changes','变更记录']]} tab={tab} setTab={setTab} close={onClose} footer={management ? <><button className="btn" onClick={() => setManagement(false)}>取消</button><button className="btn primary" onClick={saveManagement}>保存管理关系</button></> : acting ? <><button className="btn" onClick={() => { setActing(null); setOpinion('') }}>取消</button><button className="btn primary" onClick={() => changeAction(acting, 'return')}>提交退回意见</button></> : <><button className="btn" onClick={onClose}>关闭</button><button className="btn primary" onClick={() => setManagement(true)}>维护管理关系</button></>}>
+    {message && <div className="ea-notice" role="status">{message}</div>}
+    {management ? <div className="ea-management"><p>仅维护园区纳入关系。企业主体资料由企业提交变更申请。</p><label>纳入状态<select value={draft.managedStatus} onChange={e => setDraft({ ...draft, managedStatus: e.target.value })}><option>已纳管</option><option>待纳入</option><option>已退出</option></select></label><label>纳入时间<input type="date" value={draft.includedAt || ''} onChange={e => setDraft({ ...draft, includedAt: e.target.value })}/></label>{draft.managedStatus === '已退出' && <label>退出时间<input type="date" value={draft.exitedAt || ''} onChange={e => setDraft({ ...draft, exitedAt: e.target.value })}/></label>}<label>园区管理范围<input value={draft.managementScope} onChange={e => setDraft({ ...draft, managementScope: e.target.value })}/></label></div> : <>
+      {tab === 'basic' && <><div className="ea-state">当前纳入状态：<Badge value={enterprise.managedStatus}/></div><Summary enterprise={enterprise}/></>}
+      {tab === 'related' && <Related enterprise={enterprise} park navigate={navigate}/>}
+      {tab === 'changes' && <><ChangeList enterpriseId={enterpriseId} park onTask={viewTask} onAction={(change, action) => action === 'return' ? (setActing(change), setOpinion('')) : changeAction(change, action)}/>{acting && <label className="ea-return">退回意见（必填）<textarea value={opinion} onChange={e => setOpinion(e.target.value)} autoFocus/></label>}</>}
+    </>}
+  </DrawerFrame>
+}
+
+export function ImportantChangeDrawer({ enterpriseId, request, onClose }) {
+  const archive = useEnterpriseArchive(), { tasks, records } = useCollaboration(), current = effectiveProfile(archive, enterpriseId)
+  const [field, setField] = useState(request?.field || 'statisticsBoundary'), [proposedValue, setProposedValue] = useState(request?.proposedValue || ''), [reason, setReason] = useState(request?.reason || ''), [effectiveDate, setEffectiveDate] = useState(request?.effectiveDate || '2026-11-01'), [materials, setMaterials] = useState(request?.materials || []), [message, setMessage] = useState(''), [busy, setBusy] = useState(false)
+  const upload = async e => { const files = [...e.target.files]; e.target.value = ''; setBusy(true); try { if (files.some(file => file.size > 2 * 1024 * 1024)) throw new Error('单个材料请控制在 2MB 内'); const next = await Promise.all(files.map(file => new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve({ id: crypto.randomUUID(), name: file.name, data: reader.result }); reader.onerror = () => reject(new Error('材料读取失败')); reader.readAsDataURL(file) }))); setMaterials(items => [...items, ...next]) } catch (error) { setMessage(error.message) } finally { setBusy(false) } }
+  const submit = () => {
+    try {
+      const payload = { field, proposedValue, reason, effectiveDate, materials }
+      const id = request?.id || `archive-${crypto.randomUUID()}`
+      const linked = request?.taskId && tasks.find(t => t.id === request.taskId)
+      if (linked && !['待企业提交','退回补充'].includes(linked.status)) throw new Error('关联任务当前不可再次提交')
+      if (!String(proposedValue).trim() || !String(reason).trim() || !effectiveDate) throw new Error('请填写拟变更内容、原因和生效日期')
+      if (String(proposedValue).trim() === current[field]) throw new Error('拟变更内容与当前有效内容相同')
+      if (field === 'creditCode' && !/^[0-9A-Z]{18}$/.test(proposedValue.trim())) throw new Error('统一社会信用代码须为 18 位大写字母或数字')
+      if (!materials.length) throw new Error('请上传或保留依据材料')
+      applyArchiveAction(archiveSnapshot(), { action: 'submit', id, enterpriseId, actor: enterpriseId, payload })
+      const recordId = (records.find(r => r.enterpriseId === enterpriseId && r.period === '2026-09' && r.business === '基础档案') || records.find(r => r.enterpriseId === enterpriseId && r.period === '2026-09'))?.id
+      const taskId = linked?.id || createTask({ applicationId: id, name: `确认${fieldLabel(field)}变更`, enterpriseId, type: '变更确认', recordId, period: '2026-09', deadline: `${effectiveDate}T18:00`, scope: `确认${fieldLabel(field)}由“${current[field]}”调整为“${proposedValue}”。`, requirement: '请核对申请内容及依据材料。', change: proposedValue })
+      archiveAction({ action: 'submit', id, enterpriseId, actor: enterpriseId, payload: { ...payload, taskId } })
+      taskAction({ action: 'submit', id: taskId, actor: enterpriseId, payload: { explanation: reason, materials, note: '已通过基础档案提交重要变更申请。' } })
+      onClose()
+    } catch (error) { setMessage(error.message) }
+  }
+  return <DrawerFrame title="申请重要变更" close={onClose} footer={<><button className="btn" onClick={onClose}>取消</button><button className="btn primary" disabled={busy} onClick={submit}>{request?.status === '退回补充' ? '再次提交' : '提交申请'}</button></>}>
+    <div className="ea-notice">提交后由园区确认；生效前沿用当前有效档案。</div>{message && <div className="ea-error" role="alert">{message}</div>}{request?.feedback && <div className="ea-feedback"><b>园区反馈 · {request.feedback.at}</b><p>{request.feedback.opinion}</p></div>}
+    <div className="ea-form"><label>变更事项<select value={field} disabled={!!request} onChange={e => { setField(e.target.value); setProposedValue('') }}>{changeFields.map(item => <option value={item.key} key={item.key}>{item.label}</option>)}</select></label><label>当前有效内容<input value={val(current[field])} readOnly/></label><label>拟变更内容{field === 'statisticsBoundary' || field === 'managementScope' || field === 'address' ? <textarea value={proposedValue} onChange={e => setProposedValue(e.target.value)}/> : <input value={proposedValue} onChange={e => setProposedValue(e.target.value)}/>}</label><label>变更原因<textarea value={reason} onChange={e => setReason(e.target.value)} maxLength={500}/><small>{reason.length}/500</small></label><label>拟生效时间<input type="date" value={effectiveDate} onChange={e => setEffectiveDate(e.target.value)}/></label><label>依据材料<input type="file" multiple onChange={upload}/></label><div className="ea-material-list">{materials.map(m => <div key={m.id}><MaterialLink item={m}/><button aria-label={`移除${m.name}`} onClick={() => setMaterials(items => items.filter(x => x.id !== m.id))}>×</button></div>)}</div></div>
+  </DrawerFrame>
+}
+
+export function EnterpriseBasicArchivePage() {
+  const { currentEnterpriseId } = useSharedData(), archive = useEnterpriseArchive(), navigate = useNavigate(), location = useLocation(), enterprise = effectiveProfile(archive, currentEnterpriseId)
+  const [tab, setTab] = useState(new URLSearchParams(location.search).has('changeId') ? 'changes' : 'basic'), [editing, setEditing] = useState(false), [contact, setContact] = useState(enterprise.contact), [phone, setPhone] = useState(enterprise.phone), [change, setChange] = useState(undefined), [notice, setNotice] = useState('')
+  const saveContact = () => { try { archiveAction({ action: 'contact', enterpriseId: currentEnterpriseId, actor: currentEnterpriseId, payload: { contact, phone } }); setEditing(false); setNotice('日常联系信息已更新并留痕。') } catch (error) { setNotice(error.message) } }
+  return <div className="content dm-page ea-page"><div className="ea-page-head"><h1>基础档案</h1><p>维护本企业基础资料，查看关联关系与变更进度。</p></div><div className="ea-profile-head"><div><strong title={enterprise.name}>{enterprise.name}</strong><Badge value={enterprise.managedStatus}/></div><span>最后更新：{enterprise.updatedAt}</span></div>{notice && <div className="ea-notice" role="status">{notice}</div>}
+    <nav className="ct-tabs ea-page-tabs">{[['basic','基础资料'],['related','关联信息'],['changes','变更记录']].map(([key,label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}</button>)}</nav>
+    {tab === 'basic' && <div className="ea-cards"><section><header><h2>企业信息</h2><button className="btn" onClick={() => setChange(null)}>申请重要变更</button></header><div className="ea-fields">{[['企业名称',enterprise.name],['统一社会信用代码',enterprise.creditCode],['所属行业',enterprise.industry],['企业类型',enterprise.enterpriseType],['主要产品',enterprise.mainProducts],['生产规模',enterprise.productionScale],['企业地址',enterprise.address]].map(([key,value]) => <div key={key}><span>{key}</span><b title={value}>{val(value)}</b></div>)}</div></section><section><header><h2>日常联系信息</h2>{!editing && <button className="op-btn" onClick={() => { setContact(enterprise.contact); setPhone(enterprise.phone); setEditing(true) }}>编辑</button>}</header>{editing ? <div className="ea-edit-contact"><label>联系人<input value={contact} onChange={e => setContact(e.target.value)}/></label><label>联系电话<input value={phone} onChange={e => setPhone(e.target.value)}/></label><div><button className="btn" onClick={() => setEditing(false)}>取消</button><button className="btn primary" onClick={saveContact}>保存</button></div></div> : <div className="ea-fields"><div><span>联系人</span><b>{val(enterprise.contact)}</b></div><div><span>联系电话</span><b>{val(enterprise.phone)}</b></div></div>}</section><section><header><h2>园区管理关系</h2><span>由园区维护</span></header><div className="ea-fields"><div><span>纳入状态</span><b><Badge value={enterprise.managedStatus}/></b></div><div><span>纳入时间</span><b>{val(enterprise.includedAt)}</b></div><div><span>园区统计边界</span><b title={enterprise.statisticsBoundary}>{val(enterprise.statisticsBoundary)}</b></div></div></section></div>}
+    {tab === 'related' && <section className="ea-card"><h2>关联信息</h2><Related enterprise={enterprise} park={false} navigate={navigate}/></section>}
+    {tab === 'changes' && <section className="ea-card"><h2>变更记录</h2><ChangeList enterpriseId={currentEnterpriseId} park={false} onEdit={item => setChange(item)} onTask={id => navigate(`/enterprise-data-reporting?taskId=${encodeURIComponent(id)}`)}/></section>}
+    {change !== undefined && <ImportantChangeDrawer key={change?.id || 'new'} enterpriseId={currentEnterpriseId} request={change} onClose={() => setChange(undefined)}/>}
+  </div>
+}

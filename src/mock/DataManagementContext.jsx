@@ -1,9 +1,10 @@
 import { createContext,useContext,useMemo,useState } from 'react'
-import { enterprises } from './masterData.js'
+import { useEnterpriseArchive, effectiveProfile, setArchiveProfiles } from './enterpriseArchiveStore.js'
 import { businessDataRecords,dataIssues,energyBusinessData,energyFlowRelations,energyNodes,qualityStatusForIssue,dataItemDefinitions } from './dataManagementStore.js'
 const DataManagementContext=createContext(null)
 export function DataManagementProvider({children}){
- const [enterpriseRows,setEnterpriseRows]=useState(enterprises),[records,setRecords]=useState(businessDataRecords),[energyRecords,setEnergyRecords]=useState(energyBusinessData),[issues,setIssues]=useState(dataIssues),[nodes,setNodes]=useState(energyNodes),[flows,setFlows]=useState(energyFlowRelations)
+ const archive=useEnterpriseArchive(),enterpriseRows=archive.profiles.map(profile=>effectiveProfile(archive,profile.enterpriseId)),setEnterpriseRows=setArchiveProfiles
+ const [records,setRecords]=useState(businessDataRecords),[energyRecords,setEnergyRecords]=useState(energyBusinessData),[issues,setIssues]=useState(dataIssues),[nodes,setNodes]=useState(energyNodes),[flows,setFlows]=useState(energyFlowRelations)
  const statusCode={待处理:'pending',处理中:'processing',待确认:'confirming',已解决:'resolved'}
  const updateIssue=(issueId,patch)=>setIssues(prev=>prev.map(item=>item.issueId===issueId?{...item,...patch,statusCode:patch.status?statusCode[patch.status]||item.statusCode:item.statusCode}:item))
  const updateIssueStatus=(issueId,status)=>{const issue=issues.find(item=>item.issueId===issueId);if(!issue)return;updateIssue(issueId,{status,resolvedAt:status==='已解决'?'刚刚':issue.resolvedAt});if(issue.objectType==='BUSINESS_DATA')setRecords(prev=>prev.map(record=>{if(record.recordId!==issue.objectId)return record;const otherActive=issues.some(item=>item.issueId!==issueId&&item.objectId===issue.objectId&&item.status!=='已解决');return {...record,qualityStatus:status==='已解决'&&!otherActive?'正常':qualityStatusForIssue(issue)}}))}

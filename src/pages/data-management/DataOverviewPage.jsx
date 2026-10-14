@@ -1,59 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { ReportingTaskMonitoringPage } from '../ReportingTaskMonitoringPage.jsx'
-import { useSharedData } from '../../mock/sharedStore.js'
-import { Tabs } from '../../components/Tabs.jsx'
-import { Modal } from '../../components/Modal.jsx'
-import { Table } from './shared.jsx'
+import { enterprises } from '../../mock/masterData.js'
+import { categories, sourceNames, taskStates, overdue, useCollaboration, enterpriseName } from '../../mock/collaborationStore.js'
+import { TaskList, TaskCreate, Cell, recordPath } from '../../components/CollaborationTasks.jsx'
 import '../../data-overview.css'
-
-const sources = [
-  { name: '自动采集', expected: 80, acquired: 78 },
-  { name: '系统接口', expected: 60, acquired: 56 },
-  { name: '园区维护', expected: 40, acquired: 32 },
-  { name: '企业填报', expected: 60, acquired: 46 },
-]
-const categories = ['能源数据', '运营数据', '专项数据']
-const issueTypes = ['缺失', '更新滞后', '异常', '重复', '待确认']
-const taskStates = ['已完成', '处理中', '待反馈']
-const taskColors = ['#079f95', '#36cdb3', '#ffad37']
-const issueSamples = [
-  ['缺失', '天然气消费量', '缺少本期数据', '企业填报员', 'ENERGY_NATURAL_GAS'],
-  ['更新滞后', '电力消费量', '超过约定更新时间', '企业填报员', 'ENERGY_ELECTRICITY'],
-  ['异常', '产品产量', '较上期变化较大，待核实', '企业填报员', 'OP_PRODUCT_OUTPUT'],
-  ['重复', '外购热力', '接口与填报记录重复', '园区数据管理员', 'ENERGY_HEAT'],
-  ['待确认', '热力产出量', '已提交，待确认', '园区数据管理员', 'ENERGY_HEAT'],
-  ['缺失', '绿色建筑面积', '缺少本期数据', '企业填报员', 'SPECIAL_GREEN_BUILDING_AREA'],
-]
-const categoryFor = code => code.startsWith('OP_') ? '运营数据' : code.startsWith('SPECIAL_') ? '专项数据' : '能源数据'
-const monthText = period => `${period.slice(0, 4)}年${Number(period.slice(5))}月`
-
-function makeMockData(period, enterprises) {
-  const month = Number(period.slice(5))
-  const gap = month === 9 ? 0 : month === 8 ? 2 : 5
-  const obligations = sources.flatMap((source, sourceIndex) => Array.from({ length: source.expected }, (_, index) => {
-    const missing = source.expected - Math.max(0, source.acquired - gap)
-    const enterpriseIndex = index < missing ? 22 + index % 2 : (index - missing) % 22
-    const acquired = index >= missing
-    return { id: `${period}-${sourceIndex}-${index}`, source: source.name, enterpriseIndex, category: categories[(index + sourceIndex) % 3], acquired }
-  }))
-  const count = month === 9 ? 28 : month === 8 ? 24 : 19
-  const issues = Array.from({ length: count }, (_, index) => {
-    const type = index === 4 || index >= count - 7 ? '待确认' : index === 5 ? '缺失' : issueTypes[index % 4]
-    const sample = index === 5 ? issueSamples[5] : issueSamples.find(item => item[0] === type)
-    const enterpriseIndex = index % Math.min(enterprises.length, 6)
-    const code = sample[4]
-    return { id: `${period}-issue-${index}`, type, enterpriseIndex, category: categoryFor(code), item: sample[1], code, description: sample[2], owner: sample[3], taskIndex: index === 1 ? 1 : null }
-  })
-  const done = month === 9 ? 12 : month === 8 ? 9 : 7
-  const processing = month === 9 ? 4 : month === 8 ? 4 : 3
-  const tasks = Array.from({ length: month === 9 ? 18 : month === 8 ? 15 : 12 }, (_, index) => ({
-    id: `${period}-task-${index}`, enterpriseIndex: index % Math.min(enterprises.length, 6), category: categories[index % 3],
-    state: index < done ? '已完成' : index < done + processing ? '处理中' : '待反馈',
-    overdue: index === done || index === done + processing,
-  }))
-  return { obligations, issues, tasks }
-}
 
 function SourceChart({ rows }) {
   const max = Math.max(1, ...rows.map(row => row.expected))
@@ -65,58 +15,33 @@ function SourceChart({ rows }) {
 }
 
 function TaskChart({ tasks, onView }) {
-  const counts = taskStates.map(state => tasks.filter(task => task.state === state).length)
-  const total = tasks.length
-  const first = total ? counts[0] / total * 100 : 0
-  const second = total ? (counts[0] + counts[1]) / total * 100 : 0
-  const overdue = tasks.filter(task => task.overdue && task.state !== '已完成').length
-  return <><div className="pdo-task-chart"><div className="pdo-donut" style={{ background: total ? `conic-gradient(${taskColors[0]} 0 ${first}%, ${taskColors[1]} ${first}% ${second}%, ${taskColors[2]} ${second}% 100%)` : '#e8f1f0' }} role="img" aria-label={taskStates.map((state, index) => `${state}${counts[index]}项`).join('，')}><div className="pdo-donut-center"><b>{total}<small>项</small></b><span>本期任务</span></div></div><div className="pdo-task-legend">{taskStates.map((state, index) => <div key={state}><i style={{ background: taskColors[index] }}/><span>{state}</span><b>{counts[index]}<small>项</small></b></div>)}</div></div><div className="pdo-overdue"><span>● &nbsp;逾期任务 <b>{overdue} 项</b></span><button onClick={onView}>查看任务 →</button></div></>
+  const colors = ['#079f95', '#36cdb3', '#ffad37', '#ef6c78']
+  const counts = taskStates.map(s => tasks.filter(t => t.status === s).length)
+  let cursor = 0
+  const gradient = counts.map((count, i) => { const start = cursor; cursor += tasks.length ? count / tasks.length * 100 : 0; return `${colors[i]} ${start}% ${cursor}%` }).join(',')
+  return <><div className="pdo-task-chart"><div className="pdo-donut" role="img" aria-label={taskStates.map((s,i) => `${s}${counts[i]}项`).join('，')} style={{background:tasks.length ? `conic-gradient(${gradient})` : '#e8f1f0'}}><div className="pdo-donut-center"><b>{tasks.length}<small>项</small></b><span>协同任务</span></div></div><div className="pdo-task-legend">{taskStates.map((s,i) => <div key={s}><i style={{background:colors[i]}}/><span>{s}</span><b style={{color:colors[i]}}>{counts[i]}<small>项</small></b></div>)}</div></div><div className="pdo-overdue"><span>● 逾期未完成 <b>{tasks.filter(t => overdue(t)).length} 项</b></span><button onClick={onView}>查看任务 →</button></div></>
 }
 
-export function DataOverviewPage({ enterpriseRows, navigate }) {
-  const { tasks: linkedTasks } = useSharedData()
-  const [searchParams] = useSearchParams()
-  const overviewTab = searchParams.get('tab') === 'reporting' ? 'reporting' : 'overview'
-  const [draft, setDraft] = useState({ period: '2026-09', enterprise: '', category: '' })
-  const [filters, setFilters] = useState(draft)
-  const [issueType, setIssueType] = useState('')
-  const [showAll, setShowAll] = useState(false)
-  const [selectedRecord, setSelectedRecord] = useState(null)
-  const enterprises = useMemo(() => Array.from({ length: 24 }, (_, index) => enterpriseRows[index] || { enterpriseId: `example-${index + 1}`, name: `示例企业${index + 1}` }), [enterpriseRows])
-  const data = useMemo(() => makeMockData(filters.period, enterprises), [filters.period, enterprises])
-  const enterpriseIndex = filters.enterprise === '' ? null : Number(filters.enterprise)
-  const match = item => (enterpriseIndex === null || item.enterpriseIndex === enterpriseIndex) && (!filters.category || item.category === filters.category)
-  const obligations = data.obligations.filter(match)
-  const issues = data.issues.filter(match)
-  const tasks = data.tasks.filter(match)
-  const sourceRows = sources.map(source => ({ name: source.name, expected: obligations.filter(item => item.source === source.name).length, acquired: obligations.filter(item => item.source === source.name && item.acquired).length }))
-  const expected = sourceRows.reduce((sum, row) => sum + row.expected, 0)
-  const acquired = sourceRows.reduce((sum, row) => sum + row.acquired, 0)
-  const covered = new Set(obligations.filter(item => item.acquired).map(item => item.enterpriseIndex)).size
-  const managed = enterpriseIndex === null ? enterprises.length : 1
-  const problemCount = issues.filter(item => item.type !== '待确认').length
-  const confirmCount = issues.length - problemCount
-  const visibleIssues = issues.filter(item => !issueType || item.type === issueType)
-  const displayIssues = showAll ? visibleIssues : visibleIssues.slice(0, 5)
-  const taskLink = issue => {
-    const enterpriseId = issue && enterprises[issue.enterpriseIndex]?.enterpriseId
-    const actual = linkedTasks.find(task => task.enterpriseId === enterpriseId)
-    navigate(`/data-overview?tab=reporting${actual ? `&taskId=${encodeURIComponent(actual.taskId)}` : ''}`)
-  }
-  return <div className="content dm-page pdo-page">
-    <div className="pdo-heading"><h1>园区数据总览 <span>示例数据</span></h1><p>掌握数据覆盖、更新与协同进展，为能碳分析提供数据保障。</p></div>
-    <Tabs className="dm-data-overview-tabs" tabs={[{ value: 'overview', label: '数据保障概览' }, { value: 'reporting', label: '企业填报任务' }]} active={overviewTab} onChange={tab => navigate(`/data-overview?tab=${tab}`)} />
-    {overviewTab === 'reporting' ? <ReportingTaskMonitoringPage embedded /> : <>
-      <form className="pdo-filters" onSubmit={event => { event.preventDefault(); setFilters(draft); setShowAll(false); setIssueType('') }}>
-        <label>统计期间：<select value={draft.period} onChange={event => setDraft({ ...draft, period: event.target.value })}>{['2026-09', '2026-08', '2026-07'].map(period => <option value={period} key={period}>{monthText(period)}</option>)}</select></label>
-        <label>企业：<select value={draft.enterprise} onChange={event => setDraft({ ...draft, enterprise: event.target.value })}><option value="">全部</option>{enterprises.map((enterprise, index) => <option key={enterprise.enterpriseId} value={index}>{enterprise.name}</option>)}</select></label>
-        <label>数据类别：<select value={draft.category} onChange={event => setDraft({ ...draft, category: event.target.value })}><option value="">全部</option>{categories.map(category => <option key={category}>{category}</option>)}</select></label>
-        <button className="pdo-search" type="submit">⌕ &nbsp;查询</button><span className="pdo-updated">更新时间：2026-10-13 16:30</span>
-      </form>
-      <div className="pdo-stats"><div className="pdo-stat"><div className="pdo-stat-icon">▥</div><div><h2>企业数据覆盖</h2><strong>{covered} <em>/ {managed}</em><small> 家</small></strong><p>已提供本期数据 / 纳入管理企业</p></div></div><div className="pdo-stat"><div className="pdo-stat-icon">▤</div><div><h2>数据取得情况</h2><strong>{acquired} <em>/ {expected}</em><small> 项</small></strong><p>已取得 / 应提供 · 完整率 <b>{expected ? (acquired / expected * 100).toFixed(1) : '0.0'}%</b></p></div></div><div className="pdo-stat warn"><div className="pdo-stat-icon">▦</div><div><h2>待处理事项</h2><strong>{issues.length}<small> 项</small></strong><p>数据问题 {problemCount} 项 · 待确认 {confirmCount} 项</p></div></div></div>
-      <div className="pdo-charts"><section className="pdo-panel"><div className="pdo-panel-head"><h2>数据来源覆盖情况</h2><div className="pdo-legend"><span><i className="expected"/>应提供</span><span><i className="acquired"/>已取得</span></div></div><SourceChart rows={sourceRows}/></section><section className="pdo-panel"><div className="pdo-panel-head"><h2>协同任务进展</h2><button onClick={() => navigate('/data-overview?tab=reporting')}>查看全部任务 →</button></div><TaskChart tasks={tasks} onView={() => navigate('/data-overview?tab=reporting')}/></section></div>
-      <section className="pdo-panel pdo-issues"><div className="pdo-panel-head"><h2>待处理清单</h2><div className="pdo-list-actions"><label>问题类型：<select value={issueType} onChange={event => { setIssueType(event.target.value); setShowAll(false) }}><option value="">全部</option>{issueTypes.map(type => <option key={type}>{type}</option>)}</select></label><button onClick={() => setShowAll(value => !value)}>{showAll ? '收起清单' : `查看全部 ${visibleIssues.length} 项`} →</button></div></div><Table className="pdo-table" headers={['问题类型', '数据主体', '数据项', '统计期间', '问题说明', '责任方', '操作']} rows={displayIssues.map(issue => ({ key: issue.id, cells: [<span className={`pdo-issue-tag ${issue.type === '待确认' ? 'confirm' : issue.type === '异常' ? 'abnormal' : ''}`}>{issue.type}</span>, enterprises[issue.enterpriseIndex].name, issue.item, filters.period, issue.description, issue.owner, <button className="op-btn" onClick={() => issue.taskIndex === null ? setSelectedRecord(issue) : taskLink(issue)}>{issue.taskIndex === null ? '查看记录' : '查看任务'}</button>] }))}/><div className="pdo-foot"><span>ⓘ &nbsp;完整率按本期应提供数据计算；已取得不代表已核实有效。</span><span>共 {visibleIssues.length} 项 · 当前展示 {displayIssues.length} 项</span></div></section>
-      <Modal open={!!selectedRecord} title="数据记录详情 · 示例数据" onClose={() => setSelectedRecord(null)} className="small"><div className="modal-body"><div className="dm-detail-grid"><div><label>数据主体</label><b>{selectedRecord && enterprises[selectedRecord.enterpriseIndex].name}</b></div><div><label>统计期间</label><b>{filters.period}</b></div><div><label>数据项</label><b>{selectedRecord?.item}</b></div><div><label>数据项编码</label><b>{selectedRecord?.code}</b></div><div><label>问题类型</label><b>{selectedRecord?.type}</b></div><div><label>责任方</label><b>{selectedRecord?.owner}</b></div><div className="wide"><label>问题说明</label><p>{selectedRecord?.description}</p></div></div></div><div className="modal-foot"><button className="btn" onClick={() => setSelectedRecord(null)}>关闭</button></div></Modal>
-    </>}
-  </div>
+export function DataOverviewPage({ navigate }) {
+  const { tasks, records, updatedAt } = useCollaboration()
+  const [params] = useSearchParams(), tab = params.get('tab') === 'reporting' ? 'reporting' : 'overview'
+  const [draft, setDraft] = useState({period:'2026-09',enterprise:'',category:''}), [filters,setFilters] = useState(draft)
+  const [issueType,setIssueType] = useState(''), [showAll,setShowAll] = useState(false), [creating,setCreating] = useState(false)
+  const match = r => r.period === filters.period && (!filters.enterprise || r.enterpriseId === filters.enterprise) && (!filters.category || r.category === filters.category)
+  const scoped = records.filter(match), acquired = scoped.filter(r => r.value !== ''), confirmed = acquired.filter(r => r.confirmed).length
+  const coverage = new Set(acquired.map(r => r.enterpriseId)).size
+  const issueOrder = ['缺失', '更新滞后', '异常', '重复', '待确认', '资料缺失', '变更待确认']
+  const issueGroups = issueOrder.map(type => scoped.filter(r => r.issue === type))
+  const issues = Array.from({length: Math.max(0, ...issueGroups.map(g => g.length))}, (_, i) => issueGroups.map(g => g[i]).filter(Boolean)).flat(), problemCount = issues.filter(r => r.issue !== '待确认').length
+  const filteredIssues = issues.filter(r => !issueType || r.issue === issueType), visible = showAll ? filteredIssues : filteredIssues.slice(0,5)
+  const scopedTasks = tasks.filter(t => { const r = records.find(r => r.id === t.recordId); return r && match(r) })
+  const sources = sourceNames.map(name => ({name,expected:scoped.filter(r => r.source === name).length,acquired:acquired.filter(r => r.source === name).length}))
+  const taskFor = r => tasks.find(t => t.recordId === r.id && t.status !== '已完成') || tasks.find(t => t.recordId === r.id)
+  const goTasks = (late=false) => navigate(`/data-overview?tab=reporting${late ? '&overdue=1' : ''}`)
+  return <div className="content dm-page pdo-page"><div className="pdo-heading"><h1>园区数据总览 <span>示例数据</span></h1></div><div className="ct-overview-tabs"><nav className="ct-tabs"><button className={tab==='overview'?'active':''} onClick={()=>navigate('/data-overview')}>数据保障概览</button><button className={tab==='reporting'?'active':''} onClick={()=>goTasks()}>协同任务 <small>{tasks.length}</small></button></nav><button className="btn primary" onClick={()=>setCreating(true)}>＋ 发起任务</button></div>
+  {tab==='reporting'?<TaskList park/>:<><form className="pdo-filters" onSubmit={e=>{e.preventDefault();setFilters(draft);setShowAll(false)}}><label>统计期间<select value={draft.period} onChange={e=>setDraft({...draft,period:e.target.value})}>{['2026-09','2026-08','2026-07'].map(p=><option key={p}>{p}</option>)}</select></label><label>企业<select value={draft.enterprise} onChange={e=>setDraft({...draft,enterprise:e.target.value})}><option value="">全部</option>{enterprises.map(e=><option value={e.id} key={e.id}>{e.name}</option>)}</select></label><label>数据类别<select value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value})}><option value="">全部</option>{categories.map(c=><option key={c}>{c}</option>)}</select></label><button className="pdo-search">查询</button><span className="pdo-updated">更新时间：{updatedAt}</span></form>
+  <div className="pdo-stats"><div className="pdo-stat"><div className="pdo-stat-icon">▥</div><div><h2>企业数据覆盖</h2><strong>{coverage} <em>/ {filters.enterprise?1:enterprises.length}</em><small> 家</small></strong><p>已提供本期数据 / 本期纳入管理企业</p></div></div><div className="pdo-stat"><div className="pdo-stat-icon">▤</div><div><h2>数据取得情况</h2><strong>{acquired.length} <em>/ {scoped.length}</em><small> 项</small></strong><p>完整率 <b>{scoped.length?(acquired.length/scoped.length*100).toFixed(1):'0.0'}%</b></p><p>已确认 {confirmed} 项 · 待确认 {acquired.length-confirmed} 项</p></div></div><div className="pdo-stat warn"><div className="pdo-stat-icon">▦</div><div><h2>待处理事项</h2><strong>{issues.length}<small> 项</small></strong><p>数据问题 {problemCount} 项 · 待确认事项 {issues.length-problemCount} 项</p></div></div></div>
+  <div className="pdo-charts"><section className="pdo-panel"><div className="pdo-panel-head"><h2>数据来源覆盖情况</h2><div className="pdo-legend"><span><i className="expected"/>应提供</span><span><i className="acquired"/>已取得</span></div></div><SourceChart rows={sources}/></section><section className="pdo-panel"><div className="pdo-panel-head"><h2>协同任务进展</h2><button onClick={()=>goTasks()}>管理任务 →</button></div><TaskChart tasks={scopedTasks} onView={()=>goTasks(true)}/></section></div>
+  <section className="pdo-panel pdo-issues"><div className="pdo-panel-head"><h2>待处理清单</h2><div className="pdo-list-actions"><label>问题类型<select value={issueType} onChange={e=>{setIssueType(e.target.value);setShowAll(false)}}><option value="">全部</option>{[...new Set(records.map(r=>r.issue).filter(Boolean))].map(t=><option key={t}>{t}</option>)}</select></label><button onClick={()=>setShowAll(v=>!v)}>{showAll?'收起清单':`查看全部 ${filteredIssues.length} 项`} →</button></div></div><div className="table-wrap"><table className="pdo-table dm-table"><thead><tr>{['问题类型','数据主体','数据项','统计期间','问题说明','责任方','操作'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{visible.map(r=>{const task=taskFor(r);return <tr key={r.id}><Cell>{r.issue}</Cell><Cell>{enterpriseName(r.enterpriseId)}</Cell><Cell>{r.name}</Cell><Cell>{r.period}</Cell><Cell>{r.description}</Cell><Cell>{['待确认','重复'].includes(r.issue)?'园区管理员':'企业填报员'}</Cell><td><button className="op-btn" onClick={()=>task?navigate(`/data-overview?tab=reporting&taskId=${task.id}`):['缺失','资料缺失'].includes(r.issue)?setCreating(r):navigate(recordPath(r,true))}>{task?'查看任务':['缺失','资料缺失'].includes(r.issue)?'发起任务':'查看记录'}</button></td></tr>})}</tbody></table>{!visible.length&&<div className="ct-empty">暂无待处理事项</div>}</div><div className="pdo-foot"><span>ⓘ 完整率按本期应提供数据计算；已取得不代表已核实有效。</span><span>共 {filteredIssues.length} 项 · 当前展示 {visible.length} 项</span></div></section></>}
+  {creating&&<TaskCreate initial={creating===true?null:creating} onClose={()=>setCreating(false)} onCreated={id=>{setCreating(false);navigate(`/data-overview?tab=reporting&taskId=${id}`)}}/>}</div>
 }

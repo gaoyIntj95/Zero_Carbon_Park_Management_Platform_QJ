@@ -40,9 +40,9 @@ const specialSeed = [
   { specialDataId:'special-vehicles-total-ent-003', dataItemCode:'SPECIAL_TOTAL_VEHICLES', enterpriseId:'ent-003', period:'2026', value:32, unit:'辆', voucher:'车辆台账' },
 ]
 const facilitySeed = [
-  { facilityId:'facility-pv-001', enterpriseId:'ent-001', facilityType:'分布式光伏', capacity:32, unit:'MW', location:'晶澳科技厂区屋顶', commissionedAt:'2026-03-18', status:'运行中' },
-  { facilityId:'facility-pv-002', enterpriseId:'ent-002', facilityType:'分布式光伏', capacity:28, unit:'MW', location:'曲靖隆基厂区屋顶', commissionedAt:'2026-05-06', status:'运行中' },
-  { facilityId:'facility-storage-001', enterpriseId:'ent-004', facilityType:'储能', capacity:12, unit:'MWh', location:'亿纬锂能能源站', commissionedAt:'2026-07-12', status:'试运行' },
+  { facilityId:'facility-pv-001', enterpriseId:'ent-001', facilityType:'分布式光伏', capacity:32, unit:'MWp', location:'晶澳科技厂区屋顶', commissionedAt:'2026-03-18', status:'运行中' },
+  { facilityId:'facility-pv-002', enterpriseId:'ent-003', facilityType:'分布式光伏', capacity:28, unit:'MWp', location:'曲靖隆基厂区屋顶', commissionedAt:'2026-05-06', status:'运行中' },
+  { facilityId:'facility-storage-001', enterpriseId:'ent-006', facilityType:'储能', capacity:12, unit:'MWh', ratedPower:6, location:'亿纬锂能能源站', commissionedAt:'2026-07-12', status:'试运行' },
 ]
 
 export const dataItemDefinitions = [
@@ -119,7 +119,7 @@ export const businessDataRecords = rawBusinessDataRecords.map(record=>{const iss
 export const energyNodes = [
   { nodeId:'node-grid', nodeType:'能源来源', nodeRole:'SOURCE', name:'曲靖电网接入点', enterpriseId:null, subParkId:'subpark-01', energyType:'电力', energyAttribute:'常规电力', capacity:'220kV', location:'园区北侧变电站', sourceType:'园区维护', status:'启用', effectiveFrom:'2025-01-01' },
   { nodeId:'node-green-power', nodeType:'能源来源', nodeRole:'SOURCE', name:'园区绿电交易来源', enterpriseId:null, subParkId:'subpark-01', energyType:'电力', energyAttribute:'绿色电力', greenSourceType:'中长期绿电交易', capacity:'年度交易协议', location:'外部电源', sourceType:'园区维护', status:'启用', effectiveFrom:'2026-01-01' },
-  ...facilitySeed.map(item=>({nodeId:`node-${item.facilityId}`,nodeType:item.facilityType,nodeRole:'FACILITY',name:item.location,enterpriseId:item.enterpriseId,subParkId:enterprises.find(x=>x.enterpriseId===item.enterpriseId)?.subParkId,energyType:'电力',energyAttribute:item.facilityType==='分布式光伏'?'绿色电力':'常规电力',greenSourceType:item.facilityType==='分布式光伏'?'直连绿电':'',capacity:`${item.capacity} ${item.unit}`,location:item.location,sourceType:'园区维护',status:item.status==='运行中'?'启用':'试运行',effectiveFrom:item.commissionedAt})),
+  ...facilitySeed.map(item=>({nodeId:`node-${item.facilityId}`,nodeType:item.facilityType,nodeRole:'FACILITY',name:item.location,enterpriseId:item.enterpriseId,subParkId:enterprises.find(x=>x.enterpriseId===item.enterpriseId)?.subParkId,energyType:'电力',energyAttribute:item.facilityType==='分布式光伏'?'绿色电力':'常规电力',greenSourceType:item.facilityType==='分布式光伏'?'直连绿电':'',capacity:`${item.capacity} ${item.unit}`,ratedPower:item.ratedPower,location:item.location,sourceType:'企业档案映射',shareToPark:true,status:item.status==='运行中'?'启用':'试运行',effectiveFrom:item.commissionedAt})),
   ...enterprises.map(item=>({nodeId:`node-consumer-${item.enterpriseId}`,nodeType:'企业用能节点',nodeRole:'CONSUMER',name:`${item.name}用能节点`,enterpriseId:item.enterpriseId,subParkId:item.subParkId,energyType:'电力',energyAttribute:'混合电力',capacity:'按企业接入容量',location:item.address,sourceType:'企业档案映射',status:item.managedStatus==='已退出'?'停用':'启用',effectiveFrom:'2025-01-01'})),
 ]
 export const energyFlowRelations = [
